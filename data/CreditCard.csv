@@ -1,0 +1,21 @@
+CLIENTNUM,Estado_Cliente,Customer_Age,Gender,Dependent_count,Education_Level,Marital_Status,Income_Category,Card_Category,Months_on_book,Credit_Limit
+768805383,Cliente Activo,45,M,3,High School,Married,$60K - $80K,Blue,39,12691.0
+818770008,Cliente Activo,49,F,5,Graduate,Single,Less than $40K,Blue,44,8256.0
+713982108,Cliente Activo,51,M,3,Graduate,Married,$80K - $120K,Blue,36,3418.0
+769911858,Cliente Activo,40,F,4,High School,Unknown,Less than $40K,Blue,34,3313.0
+709106358,Cliente Activo,40,M,3,Uneducated,Married,$60K - $80K,Blue,21,4716.0
+713061558,Cliente Activo,44,M,2,Graduate,Married,$40K - $60K,Blue,36,4010.0
+810347208,Cliente Activo,51,M,4,Unknown,Married,$120K +,Gold,46,34516.0
+811604133,Cliente Activo,32,M,0,High School,Unknown,$60K - $80K,Silver,27,29081.0
+710930508,Cliente Activo,37,M,3,Uneducated,Single,$60K - $80K,Blue,36,22352.0
+719661558,Cliente Activo,48,M,2,Graduate,Single,$80K - $120K,Blue,36,11656.0
+708159108,Cuenta Cancelada,42,M,5,Uneducated,Single,$120K +,Blue,33,6748.0
+710821833,Cliente Activo,65,M,1,Unknown,Married,$40K - $60K,Blue,54,9095.0
+710599683,Cliente Activo,56,M,1,College,Single,$80K - $120K,Blue,36,11751.0
+816082233,Cliente Activo,35,M,3,Graduate,Unknown,$60K - $80K,Blue,30,8547.0
+712396908,Cuenta Cancelada,57,F,2,Graduate,Married,Less than $40K,Blue,48,2436.0
+714885258,Cliente Activo,44,M,4,Unknown,Unknown,$80K - $120K,Blue,37,4234.0
+709967358,Cliente Activo,48,M,4,Post-Graduate,Single,$80K - $120K,Blue,36,30367.0
+753327333,Cliente Activo,41,M,3,Unknown,Married,$80K - $120K,Blue,34,13535.0
+806160108,Cliente Activo,61,M,1,High School,Married,$40K - $60K,Blue,56,3193.0
+709327383,Cuenta Cancelada,45,F,2,Graduate,Married,Unknown,Blue,33,14470.0
