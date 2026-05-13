@@ -10,7 +10,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# ==================== FASE 1: SELECCIÓN Y CARGA DE DATOS ====================
+#  FASE 1: SELECCIÓN Y CARGA DE DATOS 
 try:
     # Cargar el dataset CSV con los indicadores ODS
     df = pd.read_csv('data/ods_data.csv')
@@ -27,11 +27,11 @@ except Exception as e:
     df = None
 
 
-# ==================== CONFIGURACIÓN DE COLUMNAS ====================
+#  CONFIGURACIÓN DE COLUMNAS 
 COUNTRY_COLUMN = 'País'
 YEAR_COLUMN = 'Año'
 
-# ==================== FUNCIONES AUXILIARES ====================
+#  FUNCIONES AUXILIARES 
 def get_unique_values(column):
     """Obtener valores únicos de una columna, ordenados"""
     if df is None or column not in df.columns:
@@ -119,7 +119,7 @@ def aggregate_indicator_values(filtered_df):
     return aggregated
 
 
-# ==================== RUTAS FLASK ====================
+#  RUTAS FLASK 
 
 @app.route('/')
 def index():
@@ -306,7 +306,7 @@ def get_statistics():
     return jsonify(stats)
 
 
-# ==================== MANEJO DE ERRORES ====================
+#   MANEJO DE ERRORES  
 
 @app.errorhandler(404)
 def not_found(error):
@@ -324,7 +324,7 @@ def server_error(error):
         return "500 - Error del servidor", 500
 
 
-# ==================== PUNTO DE ENTRADA ====================
+#   PUNTO DE ENTRADA  
 
 if __name__ == '__main__':
     print("\n" + "="*50)
