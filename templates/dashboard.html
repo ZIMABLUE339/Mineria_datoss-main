@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ODS - Indicadores de Desarrollo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                Dashboard ODS
+                <small>Objetivos de Desarrollo Sostenible</small>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#datos">Datos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#comparacion">Comparación</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container-main">
+        <!-- HEADER -->
+        <div class="header-section">
+            <h1>Indicadores de Desarrollo Sostenible (ODS)</h1>
+            <p>Explora, filtra y compara indicadores económicos y sociales de diferentes países. Datos basados en el Banco Mundial.</p>
+        </div>
+
+        <!-- ESTADÍSTICAS RÁPIDAS -->
+        <div class="stats-container" id="statsContainer">
+            <div class="stat-card">
+                <h4>Registros Totales</h4>
+                <div class="value" id="totalRecords">-</div>
+            </div>
+            <div class="stat-card">
+                <h4>Indicadores</h4>
+                <div class="value" id="totalIndicators">-</div>
+            </div>
+            <div class="stat-card">
+                <h4>Países</h4>
+                <div class="value" id="totalCountries">-</div>
+            </div>
+            <div class="stat-card">
+                <h4>Datos Faltantes</h4>
+                <div class="value" id="missingData">-</div>
+                <div class="unit">%</div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE FILTROS -->
+        <div class="filters-section" id="filtros">
+            <h3>Filtros de Búsqueda</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="filter-group">
+                        <label for="countrySelect">País</label>
+                        <input type="text" class="form-control country-search mb-2" id="searchCountrySelect" placeholder="Buscar país..." data-target="countrySelect">
+                        <select class="form-select" id="countrySelect">
+                            <option value="">Seleccionar país...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="filter-group">
+                        <label for="indicatorSelect">Indicador</label>
+                        <select class="form-select" id="indicatorSelect">
+                            <option value="">Seleccionar indicador...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="filter-group">
+                        <label for="yearInput">Año (opcional)</label>
+                        <select class="form-select" id="yearInput">
+                            <option value="">Seleccionar año...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-filter" onclick="applyFilters()">
+                Buscar Datos
+            </button>
+            <button class="btn btn-filter" style="background: var(--color-gray-medium);" onclick="resetFilters()">
+                Limpiar Filtros
+            </button>
+        </div>
+
+        <!-- SECCIÓN DE DATOS -->
+        <div class="data-section" id="datos">
+            <h3>Resultados</h3>
+            <div id="dataContainer">
+                <div class="empty-state">
+                    <p>Selecciona filtros y haz clic en "Buscar Datos" para ver resultados</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE COMPARACIÓN -->
+        <div class="comparison-section" id="comparacion">
+            <h3>Comparar Países</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="filter-group">
+                        <label for="country1Select">Primer País</label>
+                        <input type="text" class="form-control country-search mb-2" id="searchCountry1Select" placeholder="Buscar país..." data-target="country1Select">
+                        <select class="form-select" id="country1Select">
+                            <option value="">Seleccionar país...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="filter-group">
+                        <label for="country2Select">Segundo País</label>
+                        <input type="text" class="form-control country-search mb-2" id="searchCountry2Select" placeholder="Buscar país..." data-target="country2Select">
+                        <select class="form-select" id="country2Select">
+                            <option value="">Seleccionar país...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="filter-group">
+                        <label for="yearCompareInput">Año de comparación</label>
+                        <select class="form-select" id="yearCompareInput">
+                            <option value="">Seleccionar año...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4 mt-3">
+                    <div class="filter-group">
+                        <label for="indicatorCompare">Indicador a Comparar</label>
+                        <select class="form-select" id="indicatorCompare">
+                            <option value="">Seleccionar indicador...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-filter" onclick="compareCountries()">
+                Comparar
+            </button>
+            <div id="comparisonResult" style="margin-top: 20px;"></div>
+        </div>
+
+        <!-- GRÁFICOS -->
+        <div id="chartsSection" class="charts-container" style="display: none;"></div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer id="contacto">
+        <p>Dashboard ODS <span class="footer-divider">|</span> Datos del Banco Mundial</p>
+        <p style="font-size: 12px; color: #999;">Metodología SEMMA: Selección -> Exploración -> Modelado -> Visualización -> Evaluación</p>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+    <script>
+        // Variables globales
+        let currentChart = null;
+        let currentComparison = null;
+
+        // Inicializar dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFilters();
+            loadStatistics();
+            setupCountrySearch();
+        });
+
+        // Cargar opciones de filtros
+        async function loadFilters() {
+            try {
+                const response = await fetch('/api/filters');
+                const data = await response.json();
+
+                // Poblar selectores de países
+                const countries = [
+                    document.getElementById('countrySelect'),
+                    document.getElementById('country1Select'),
+                    document.getElementById('country2Select')
+                ];
+
+                countries.forEach(select => {
+                    data.countries.forEach(country => {
+                        const option = document.createElement('option');
+                        option.value = country;
+                        option.textContent = country;
+                        select.appendChild(option);
+                    });
+                });
+
+                // Poblar selector de indicadores
+                const years = [
+                    document.getElementById('yearInput'),
+                    document.getElementById('yearCompareInput')
+                ];
+
+                years.forEach(select => {
+                    data.years.forEach(year => {
+                        const option = document.createElement('option');
+                        option.value = year;
+                        option.textContent = year;
+                        select.appendChild(option);
+                    });
+                });
+
+                const indicators = [
+                    document.getElementById('indicatorSelect'),
+                    document.getElementById('indicatorCompare')
+                ];
+
+                indicators.forEach(select => {
+                    data.indicators.forEach(indicator => {
+                        const option = document.createElement('option');
+                        option.value = indicator;
+                        option.textContent = indicator.substring(0, 60) + (indicator.length > 60 ? '...' : '');
+                        select.appendChild(option);
+                    });
+                });
+            } catch (error) {
+                console.error('Error cargando filtros:', error);
+            }
+        }
+
+        // Configurar búsqueda en selects de país
+        function setupCountrySearch() {
+            document.querySelectorAll('.country-search').forEach(input => {
+                const targetId = input.dataset.target;
+                const target = document.getElementById(targetId);
+
+                input.addEventListener('input', () => {
+                    const query = input.value.toLowerCase();
+                    Array.from(target.options).forEach(option => {
+                        if (!option.value) {
+                            option.hidden = false;
+                            return;
+                        }
+                        option.hidden = query ? !option.value.toLowerCase().includes(query) : false;
+                    });
+                });
+            });
+        }
+
+        // Cargar estadísticas
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/statistics');
+                const stats = await response.json();
+
+                document.getElementById('totalRecords').textContent = stats.total_records.toLocaleString('es-ES');
+                document.getElementById('totalIndicators').textContent = stats.total_indicators;
+                document.getElementById('totalCountries').textContent = stats.countries;
+                document.getElementById('missingData').textContent = stats.missing_data_percentage.toFixed(2);
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+
+        // Aplicar filtros y cargar datos
+        async function applyFilters() {
+            const country = document.getElementById('countrySelect').value;
+            const indicator = document.getElementById('indicatorSelect').value;
+            const year = document.getElementById('yearInput').value;
+
+            if (!country && !indicator) {
+                alert('Por favor, selecciona al menos un país o indicador');
+                return;
+            }
+
+            try {
+                const params = new URLSearchParams();
+                if (country) params.append('country', country);
+                if (indicator) params.append('indicator', indicator);
+                if (year) params.append('year', year);
+
+                const response = await fetch(`/api/data?${params}`);
+                const result = await response.json();
+
+                if (result.success && result.data.length > 0) {
+                    displayData(result.data);
+                    displayChart(result.data, indicator || country);
+                } else {
+                    document.getElementById('dataContainer').innerHTML = `
+                        <div class="empty-state">
+                            <p>No se encontraron datos con los criterios especificados</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar datos');
+            }
+        }
+
+        // Mostrar datos en tabla
+        function displayData(data) {
+            if (!data || data.length === 0) return;
+
+            let html = '<div class="table-wrapper"><table class="table"><thead><tr>';
+
+            // Headers
+            html += '<th>País/Región</th>';
+            const firstRow = data[0];
+            for (const key in firstRow.values) {
+                html += `<th>${key.substring(0, 30)}</th>`;
+            }
+            html += '</tr></thead><tbody>';
+
+            // Rows
+            data.forEach(row => {
+                html += `<tr><td>${row.country}</td>`;
+                for (const key in row.values) {
+                    const value = row.values[key];
+                    html += `<td>${value !== null ? parseFloat(value).toFixed(2) : '-'}</td>`;
+                }
+                html += '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            if (firstRow.note) {
+                html += `<div class="alert alert-info mt-3">${firstRow.note}</div>`;
+            }
+            document.getElementById('dataContainer').innerHTML = html;
+        }
+
+        // Mostrar gráfico
+        function displayChart(data, title) {
+            const ctx = document.querySelector('#chartsSection');
+            ctx.innerHTML = '';
+
+            if (!data || data.length === 0) return;
+
+            const chartDiv = document.createElement('div');
+            chartDiv.className = 'chart-wrapper';
+            chartDiv.innerHTML = `
+                <h4>Visualización de ${title}</h4>
+                <canvas id="mainChart"></canvas>
+            `;
+            ctx.appendChild(chartDiv);
+            document.getElementById('chartsSection').style.display = 'grid';
+
+            const firstRow = data[0];
+            const indicators = Object.keys(firstRow.values).filter(key => key !== 'Año' && key !== 'Año ');
+            const countries = data.map(d => d.country);
+
+            const chartCanvas = document.getElementById('mainChart');
+
+            if (currentChart) currentChart.destroy();
+
+            currentChart = new Chart(chartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: countries,
+                    datasets: indicators.slice(0, 1).map((ind, idx) => ({
+                        label: ind.substring(0, 30),
+                        data: data.map(d => d.values[ind] || 0),
+                        backgroundColor: 'rgba(100, 181, 246, 0.8)',
+                        borderColor: 'rgba(66, 165, 245, 1)',
+                        borderWidth: 2
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+        }
+
+        // Comparar países
+        async function compareCountries() {
+            const country1 = document.getElementById('country1Select').value;
+            const country2 = document.getElementById('country2Select').value;
+            const year = document.getElementById('yearCompareInput').value;
+            const indicator = document.getElementById('indicatorCompare').value;
+
+            if (!country1 || !country2 || !indicator) {
+                alert('Por favor, selecciona ambos países y un indicador');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/compare', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ country1, country2, year, indicator })
+                });
+
+                const comparison = await response.json();
+
+                let html = '<div class="alert alert-info">✓ Comparación realizada exitosamente</div>';
+                html += '<div class="row">';
+
+                for (const [key, value] of Object.entries(comparison)) {
+                    html += `<div class="col-md-6"><h5>${value.name}</h5>`;
+                    if (value.data && value.data.length > 0) {
+                        html += '<ul class="list-group">';
+                        value.data.forEach(row => {
+                            for (const [k, v] of Object.entries(row.values)) {
+                                html += `<li class="list-group-item">${k}: ${v !== null ? parseFloat(v).toFixed(2) : '-'}</li>`;
+                            }
+                            if (row.note) {
+                                html += `<li class="list-group-item list-group-item-warning">${row.note}</li>`;
+                            }
+                        });
+                        html += '</ul>';
+                    } else {
+                        html += '<div class="alert alert-warning">No se encontró información suficiente para este país.</div>';
+                    }
+                    html += '</div>';
+                }
+
+                html += '</div>';
+                document.getElementById('comparisonResult').innerHTML = html;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al comparar');
+            }
+        }
+
+        // Limpiar filtros
+        function resetFilters() {
+            document.getElementById('countrySelect').value = '';
+            document.getElementById('indicatorSelect').value = '';
+            document.getElementById('yearInput').value = '';
+            document.getElementById('dataContainer').innerHTML = `
+                <div class="empty-state">
+                    <p>Selecciona filtros y haz clic en "Buscar Datos" para ver resultados</p>
+                </div>
+            `;
+            document.getElementById('chartsSection').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

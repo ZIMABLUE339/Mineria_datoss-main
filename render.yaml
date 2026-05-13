@@ -1,0 +1,15 @@
+# Render Configuration
+services:
+  - type: web
+    name: dashboard-ods
+    runtime: python
+    pythonVersion: 3.11
+    startCommand: gunicorn app:app
+    buildCommand: pip install -r requirements.txt
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: PORT
+        value: "8000"
