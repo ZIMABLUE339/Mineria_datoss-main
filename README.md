@@ -1,222 +1,168 @@
-# Dashboard ODS - Indicadores de Desarrollo Sostenible
+# ODS Explorer — Dashboard de Indicadores de Desarrollo Sostenible
 
-Un dashboard interactivo para explorar, filtrar y comparar indicadores económicos y sociales de diferentes países usando datos del Banco Mundial.
+Plataforma web multi-página para explorar, filtrar, comparar y visualizar los indicadores ODS del Banco Mundial. Construida con **Flask + Pandas + Tailwind CSS + Chart.js**, aplicando la metodología **SEMMA**.
 
-**Desarrollado con Flask, Pandas, Bootstrap y Chart.js**
+---
 
-## Características
-
-- **Filtros Dinámicos**: Buscar por país, indicador y año
-- **Visualización Interactiva**: Gráficos en tiempo real con Chart.js
-- **Comparación de Países**: Análisis comparativo entre naciones
-- **Estadísticas Rápidas**: KPIs principales del dataset
-- **Interfaz Responsiva**: Funciona en desktop, tablet y móvil
-- **Diseño Moderno**: Tonos azul claro y gris claro
-- **API RESTful**: Endpoints para integración externa
-- **Metodología SEMMA**: Aplicada en toda la arquitectura
-
-## Inicio Rápido
-
-### Requisitos Previos
-- Python 3.10+
-- pip (gestor de paquetes de Python)
-- Git
-
-### Instalación Local
+## 🚀 Inicio rápido
 
 ```bash
-# 1. Clonar el repositorio
-git clone https://github.com/tuusuario/proyecto-ods.git
-cd proyecto-ods
+# 1. Clonar
+git clone https://github.com/ZIMABLUE339/Mineria_datoss-main.git
+cd Mineria_datoss-main
 
-# 2. Crear ambiente virtual
+# 2. Ambiente virtual
 python -m venv .venv
+.venv\Scripts\activate        # Windows
+source .venv/bin/activate     # macOS/Linux
 
-# 3. Activar ambiente virtual
-# En Windows:
-.venv\Scripts\activate
-
-# En macOS/Linux:
-source .venv/bin/activate
-
-# 4. Instalar dependencias
+# 3. Dependencias
 pip install -r requirements.txt
 
-# 5. Ejecutar la aplicación
+# 4. Ejecutar
 python app.py
-
-# 6. Abrir en el navegador
-# Ir a: http://localhost:5000
 ```
 
-## Estructura del Proyecto
+Abrir en el navegador:
+- **Home:** http://localhost:5000/
+- **Dashboard:** http://localhost:5000/dashboard
+
+---
+
+## 📁 Estructura del proyecto
 
 ```
 proyecto-ods/
-├── app.py                    # Backend Flask
-├── requirements.txt          # Dependencias
-├── README.md                # Este archivo
-├── DOCUMENTACION_TECNICA.md # Documentación detallada
-├── .gitignore              # Archivos a ignorar
-├── .env.example            # Variables de entorno ejemplo
+├── app.py                    # Backend Flask — rutas y API
+├── requirements.txt
+├── render.yaml               # Configuración Render
 ├── data/
-│   └── ods_data.csv        # Dataset con indicadores
+│   └── ods_data.csv          # Dataset ODS (13.000+ registros, 21 columnas)
 └── templates/
-    ├── dashboard.html      # Frontend principal
-    ├── 404.html           # Error 404
-    └── 500.html           # Error 500
+    ├── home.html             # Página de inicio
+    ├── dashboard.html        # Dashboard principal
+    ├── multidimensional.html # Módulo Modelo Multidimensional
+    ├── orange.html           # Módulo Orange Data Mining
+    ├── spark.html            # Módulo Apache Spark
+    ├── 404.html
+    └── 500.html
 ```
 
-## Configuración
+---
 
-### Variables de Entorno
+## 📊 Dataset
 
-Crear archivo `.env` en la raíz del proyecto:
+| Campo | Detalle |
+|-------|---------|
+| Fuente | Banco Mundial vía Google Sheets |
+| Filas | ~13.100 registros |
+| Columnas | 21 (Año, Grupo regional, País + 18 indicadores) |
+| Países | 202 |
+| Rango años | 1960 – 2024 (cobertura irregular) |
+| Indicadores | PIB Total, PIB per cápita, Tasa de crecimiento, Esperanza de vida, Tasa de desempleo, Alfabetización juvenil y adultos, Matrículas (primaria/secundaria/terciaria), Población activa, totales de población |
+
+---
+
+## 🧭 Páginas y módulos
+
+| Ruta | Módulo | Estado |
+|------|--------|--------|
+| `/` | Home — explica el sistema | ✅ Activo |
+| `/dashboard` | Dashboard de indicadores | ✅ Activo |
+| `/multidimensional` | Modelo Multidimensional (PCA, clustering) | 🔜 En construcción |
+| `/orange` | Orange Data Mining (flujos visuales) | 🔜 En construcción |
+| `/spark` | Apache Spark (procesamiento distribuido) | 🔜 En construcción |
+
+---
+
+## 🔌 API REST
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/filters` | Países, años e indicadores disponibles |
+| GET | `/api/data` | Datos filtrados por país, indicador y año |
+| POST | `/api/compare` | Comparación entre dos países |
+| GET | `/api/statistics` | KPIs del dataset (total registros, países, % faltantes) |
+| GET | `/api/ranking` | Top/Bottom N países por indicador y año |
+
+### Ejemplos
 
 ```
-FLASK_ENV=development
-FLASK_DEBUG=True
-DATA_PATH=data/ods_data.csv
+GET /api/data?country=Colombia&indicator=PIB Total&year=2022
+
+GET /api/ranking?indicator=Esperanza de vida&year=2020&n=10
+
+POST /api/compare
+{ "country1": "Colombia", "country2": "Brasil", "indicator": "PIB Total", "year": "2022" }
 ```
 
-## API Endpoints
+---
 
-### GET `/` 
-Renderiza el dashboard principal
+## ✨ Características del dashboard
 
-### GET `/api/filters`
-Obtiene opciones disponibles para filtros
-```json
-{
-  "countries": ["Colombia", "Brasil", ...],
-  "indicators": ["PIB 2020", "Alfabetización 2021", ...],
-  "total_countries": 195,
-  "total_indicators": 45
-}
-```
+- **Filtros requeridos** — País e Indicador obligatorios; validación visual con borde rojo
+- **Filtro por nivel de ingreso** — Banco Mundial (Alto / Medio-alto / Medio-bajo / Bajo)
+- **Tarjeta de país** — bandera emoji, badge de nivel de ingreso, valor con formato abreviado
+- **Gráficos múltiples** — Barras, Línea, Radar (normalizado 0–100), Distribución de ingreso
+- **Ranking global** — Top/Bottom 10 con filtros propios (indicador, año, N independientes)
+- **Comparación** — 2 países con año propio, banderas y gráfico agrupado
+- **Formato automático** — valores grandes abreviados: `25.46 B`, `314 MM`, `4.5 M`
 
-### GET `/api/data`
-Obtiene datos filtrados
-```
-/api/data?country=Colombia&indicator=PIB&year=2020
-```
+---
 
-### POST `/api/compare`
-Compara indicadores entre dos países
-```json
-{
-  "country1": "Colombia",
-  "country2": "Brasil",
-  "indicator": "PIB 2020"
-}
-```
+## 🏗️ Stack tecnológico
 
-### GET `/api/statistics`
-Retorna estadísticas del dataset
-```json
-{
-  "total_records": 1500,
-  "total_indicators": 45,
-  "countries": 195,
-  "missing_data_percentage": 12.5
-}
-```
+**Backend:** Python 3.10+ · Flask · Pandas · Gunicorn
 
-## Personalización
+**Frontend:** Tailwind CSS (CDN) · Chart.js · JavaScript Vanilla · Inter + JetBrains Mono
 
-### Cambiar Colores
-Editar en `templates/dashboard.html`:
-```css
-:root {
-    --color-primary: #E3F2FD;
-    --color-accent: #64B5F6;
-    /* ... otros colores ... */
-}
-```
+**Infraestructura:** GitHub · Render (CI/CD automático)
 
-### Añadir Nuevo Indicador
-1. Actualizar CSV con nueva columna
-2. Recargar la aplicación
-3. El indicador aparecerá automáticamente en los filtros
+---
 
-## Despliegue en Render
+## 🚀 Despliegue en Render
 
-### Pasos:
+1. Push a `main` en GitHub
+2. Render ejecuta automáticamente:
+   - **Build:** `pip install -r requirements.txt`
+   - **Start:** `gunicorn app:app`
+3. Variables de entorno: `FLASK_ENV=production` · `PYTHONUNBUFFERED=1`
 
-1. **Push a GitHub**
-```bash
-git add .
-git commit -m "Deploy a Render"
-git push origin main
-```
+---
 
-2. **Crear Web Service en Render**
-   - Ir a https://render.com
-   - Nuevo "Web Service"
-   - Conectar repositorio
-   - Configurar:
-     - Build: `pip install -r requirements.txt`
-     - Start: `gunicorn app:app`
+## 📖 Metodología SEMMA
 
-3. **Variables de Entorno**
-   - `FLASK_ENV=production`
-   - `PYTHONUNBUFFERED=1`
+| Fase | Implementación |
+|------|---------------|
+| **S**elección | `filter_data()` — filtra por país, año e indicador |
+| **E**xploración | `/api/statistics` — KPIs y % de datos faltantes |
+| **M**odelado | `prepare_chart_data()` · `aggregate_indicator_values()` · normalización radar |
+| **V**isualización | Chart.js: barras, línea, radar, ranking, distribución de ingreso |
+| **A**nálisis | `/api/compare` · `/api/ranking` · clasificación por ingreso Banco Mundial |
 
-4. **Deploy**
-   - El despliegue es automático cuando haces push a `main`
+---
 
-## Metodología SEMMA
+## 📝 Changelog
 
-Este proyecto aplica la metodología SEMMA para análisis de datos:
+### v2.0.0 — 2026-05-16
+- Navegación global con 5 módulos en todas las páginas
+- Migración Bootstrap → Tailwind CSS
+- Nuevas páginas: Home, Multidimensional, Orange, Spark
+- Dashboard enriquecido: radar, ranking con filtros propios, clasificación por ingreso
+- Endpoint `/api/ranking` nuevo y corregido para la estructura real del CSV
+- Formato automático de números grandes en todos los componentes
+- Comparación con selects, año independiente y banderas
 
-- **S**elección: Filtros dinámicos
-- **E**xploración: Estadísticas y tablas
-- **M**odelado: Transformación de datos con Pandas
-- **V**isualización: Gráficos con Chart.js
-- **E**valuación: Comparación y análisis
+### v1.0.0 — 2026-05-12
+- Dashboard inicial con Flask + Bootstrap + Chart.js
+- Filtros por país, indicador y año
+- Comparación de países
+- Despliegue en Render
 
-Ver `DOCUMENTACION_TECNICA.md` para detalles completos.
+---
 
-## Testing
+## 📚 Documentación completa
 
-### Pruebas Unitarias (Opcional)
-```bash
-pip install pytest
-pytest tests/
-```
+Ver [`DOCUMENTACION_TECNICA.md`](./DOCUMENTACION_TECNICA.md) para arquitectura detallada, explicación de funciones, guía de desarrollo y troubleshooting.
 
-### Pruebas Manuales
-1. Aplicar cada filtro individualmente
-2. Combinar múltiples filtros
-3. Comparar países diferentes
-4. Verificar responsividad en móvil
-
-## Problemas Comunes
-
-| Problema | Solución |
-|----------|----------|
-| `ModuleNotFoundError` | Activar venv y instalar dependencias |
-| Datos no cargan | Verificar que CSV exista en `data/` |
-| CSS no se carga | Refrescar con Ctrl+F5 |
-| Gráficos vacíos | Revisar datos del filtro aplicado |
-
-## Documentación Completa
-
-Ver [DOCUMENTACION_TECNICA.md](DOCUMENTACION_TECNICA.md) para:
-- Arquitectura detallada
-- Explicación de cada función
-- Guía paso a paso de desarrollo
-- Consideraciones de seguridad
-- Troubleshooting avanzado
-
-## Contribuciones
-
-Las contribuciones son bienvenidas. Por favor:
-
-1. Fork el proyecto
-2. Crea una rama (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-
+**Dataset:** https://docs.google.com/spreadsheets/d/1wkkgqcA-ruldAVnp5_FOUymfi1yiOH8r/
