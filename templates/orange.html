@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Orange — Minería Visual — ODS Explorer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0b1120; color: #e2e8f0; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .nav-link { color: #64748b; text-decoration: none; }
+    .nav-link:hover { color: #e2e8f0; background: rgba(255,255,255,0.05); }
+    .nav-link.active-page { color: #fb923c; background: rgba(20,128,235,0.12); }
+    .scrollbar-hide { scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .bg-grid {
+      background-image:
+        linear-gradient(rgba(59,158,248,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,158,248,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    @keyframes pulse-slow { 0%,100%{opacity:1} 50%{opacity:.5} }
+    .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation: fadeUp 0.6s ease both; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ═══ NAV GLOBAL ═══ -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/60">
+    <div class="h-14 flex items-center px-6 gap-0 max-w-full">
+      <a href="/" class="flex items-center gap-2 group shrink-0 mr-6">
+        <div class="w-7 h-7 rounded-lg bg-ocean-600 flex items-center justify-center">
+          <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M3 12a9 9 0 1018 0 9 9 0 00-18 0"/>
+          </svg>
+        </div>
+        <span class="mono text-xs font-semibold tracking-widest text-ocean-300 uppercase hidden sm:block">ODS Explorer</span>
+      </a>
+      <div class="h-5 w-px bg-slate-800 mr-6 shrink-0"></div>
+      <nav class="flex items-center gap-1 flex-1 overflow-x-auto scrollbar-hide">
+        <a href="/" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+          Inicio
+        </a>
+        <a href="/dashboard" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+          Dashboard
+        </a>
+        <a href="/multidimensional" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
+          Modelo Multidimensional
+        </a>
+        <a href="/orange" class="nav-link active-page flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21a48.25 48.25 0 01-8.135-.687c-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg>
+          Orange
+        </a>
+        <a href="/spark" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+          Spark
+        </a>
+      </nav>
+    </div>
+  </header>
+  <!-- ═══ /NAV GLOBAL ═══ -->
+
+  <!-- CONTENIDO -->
+  <main class="pt-14 min-h-screen bg-grid flex items-center justify-center px-6">
+    <div class="max-w-2xl w-full text-center py-24">
+
+      <!-- Icono / badge -->
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 fade-up"
+           style="background: #ea580c20; border: 1px solid #ea580c30;">
+        <span class="text-4xl">🍊</span>
+      </div>
+
+      <!-- Badge "próximamente" -->
+      <div class="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6 fade-up"
+           style="background:#ea580c15; border:1px solid #ea580c25; animation-delay:.1s">
+        <span class="w-2 h-2 rounded-full animate-pulse-slow" style="background:#ea580c"></span>
+        <span class="mono text-xs uppercase tracking-widest" style="color:#ea580c">En construcción · Próximamente</span>
+      </div>
+
+      <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight fade-up" style="animation-delay:.15s">
+        Orange — Minería Visual
+      </h1>
+
+      <p class="text-slate-400 text-lg leading-relaxed mb-10 fade-up" style="animation-delay:.2s">
+        Integración con Orange Data Mining para flujos visuales de análisis. Carga los datasets ODS directamente y ejecuta flujos de clasificación, regresión y clustering sin código.
+      </p>
+
+      <!-- Bullets de lo que vendrá -->
+      <div class="grid sm:grid-cols-2 gap-3 text-left mb-12 fade-up" style="animation-delay:.25s">
+                <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
+          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#ea580c"></span>
+          <span class="text-sm text-slate-400">Flujos de trabajo visuales de clasificación y regresión</span>
+        </div>
+        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
+          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#ea580c"></span>
+          <span class="text-sm text-slate-400">Árbol de decisión sobre indicadores ODS por región</span>
+        </div>
+        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
+          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#ea580c"></span>
+          <span class="text-sm text-slate-400">Análisis de texto sobre reportes de desarrollo</span>
+        </div>
+        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
+          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#ea580c"></span>
+          <span class="text-sm text-slate-400">Exportación de modelos entrenados en Orange hacia Flask</span>
+        </div>
+        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
+          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#ea580c"></span>
+          <span class="text-sm text-slate-400">Comparación de algoritmos: Naive Bayes, SVM, Random Forest</span>
+        </div>
+        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
+          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#ea580c"></span>
+          <span class="text-sm text-slate-400">Integración bidireccional con el dataset ods_data.csv</span>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="flex flex-wrap gap-3 justify-center fade-up" style="animation-delay:.3s">
+        <a href="/dashboard"
+           class="bg-ocean-600 hover:bg-ocean-500 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors">
+          Ir al Dashboard
+        </a>
+        <a href="/"
+           class="border border-slate-700 hover:border-slate-600 text-slate-400 hover:text-slate-200 font-medium px-6 py-3 rounded-xl text-sm transition-colors">
+          ← Volver al inicio
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>

@@ -1,447 +1,1517 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard ODS - Indicadores de Desarrollo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ODS Dashboard — Indicadores Globales</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { mono: ['JetBrains Mono', 'Courier New', 'monospace'] },
+          colors: {
+            ocean: {
+              400: '#3b9ef8', 500: '#1480eb', 600: '#0a64cc',
+              700: '#0b4ea5', 900: '#123970', 950: '#0a1e3d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0b1120; color: #e2e8f0; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #0b1120; }
+    ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 4px; }
+
+    select {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 16px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .chart-canvas-wrap { position: relative; height: 260px; }
+
+    .fade-in { animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    #toast { transition: transform 0.3s ease, opacity 0.3s ease; transform: translateY(20px); opacity: 0; pointer-events: none; }
+    #toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+
+    .field-error { border-color: #ef4444 !important; box-shadow: 0 0 0 1px rgba(239,68,68,0.25) !important; }
+
+    .flag-big { font-size: 2.8rem; line-height: 1; }
+    .flag-md  { font-size: 1.8rem; line-height: 1; }
+    /* Ranking tabs */
+    .active-tab { background: #1480eb; color: #fff !important; }
+    .tab-btn:not(.active-tab):hover { background: #1e293b; color: #94a3b8; }
+
+
+    /* ── NAV GLOBAL ── */
+    .nav-link { color: #64748b; text-decoration: none; }
+    .nav-link:hover { color: #e2e8f0; background: rgba(255,255,255,0.05); }
+    .nav-link.active-page { color: #7dd3fc; background: rgba(20,128,235,0.12); }
+    .scrollbar-hide { scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    /* Radar chart */
+    .chart-canvas-radar { position: relative; height: 320px; }
+
+    /* Income level badges */
+    .income-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 600; letter-spacing: .04em; padding: 3px 10px; border-radius: 6px; }
+    .income-H  { background: rgba(16,185,129,.15); color: #34d399; border: 1px solid rgba(16,185,129,.25); }
+    .income-UM { background: rgba(59,158,248,.15); color: #7dd3fc; border: 1px solid rgba(59,158,248,.25); }
+    .income-LM { background: rgba(251,191,36,.15);  color: #fcd34d; border: 1px solid rgba(251,191,36,.25); }
+    .income-L  { background: rgba(248, 113,113,.15); color: #fca5a5; border: 1px solid rgba(248,113,113,.25); }
+    .income-UN { background: rgba(100,116,139,.12); color: #94a3b8; border: 1px solid rgba(100,116,139,.2); }
+
+    /* Ranking filter bar */
+    .rank-filter-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+    .rank-filter-group { display: flex; flex-direction: column; gap: 4px; }
+    .rank-filter-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #475569; }
+    .rank-filter-select {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      font-size: 12px;
+      border-radius: 8px;
+      padding: 5px 28px 5px 10px;
+      outline: none;
+      transition: border-color .15s;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 6px center;
+      background-size: 14px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .rank-filter-select:focus { border-color: #1480eb; }
+    .rank-filter-btn {
+      background: #1480eb;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: background .15s;
+      white-space: nowrap;
+    }
+    .rank-filter-btn:hover { background: #0a64cc; }
+    .rank-filter-n { width: 70px; }
+
+    /* Barra de progreso del ranking */
+    .rank-bar-wrap { position: relative; height: 4px; background: #1e293b; border-radius: 2px; flex: 1; overflow: hidden; }
+    .rank-bar { height: 4px; border-radius: 2px; transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+
+    /* Animación stagger para filas del ranking */
+    .rank-row { animation: rankIn 0.35s ease both; }
+    @keyframes rankIn { from { opacity:0; transform: translateX(-10px); } to { opacity:1; transform: translateX(0); } }
+  </style>
 </head>
-<body>
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">
-                Dashboard ODS
-                <small>Objetivos de Desarrollo Sostenible</small>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#datos">Datos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#comparacion">Comparación</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<body class="min-h-screen">
 
-    <!-- MAIN CONTAINER -->
-    <div class="container-main">
-        <!-- HEADER -->
-        <div class="header-section">
-            <h1>Indicadores de Desarrollo Sostenible (ODS)</h1>
-            <p>Explora, filtra y compara indicadores económicos y sociales de diferentes países. Datos basados en el Banco Mundial.</p>
-        </div>
+  <!-- ═══ NAV GLOBAL ═══ -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/60">
+    <div class="h-14 flex items-center px-6 gap-0 max-w-full">
 
-        <!-- ESTADÍSTICAS RÁPIDAS -->
-        <div class="stats-container" id="statsContainer">
-            <div class="stat-card">
-                <h4>Registros Totales</h4>
-                <div class="value" id="totalRecords">-</div>
-            </div>
-            <div class="stat-card">
-                <h4>Indicadores</h4>
-                <div class="value" id="totalIndicators">-</div>
-            </div>
-            <div class="stat-card">
-                <h4>Países</h4>
-                <div class="value" id="totalCountries">-</div>
-            </div>
-            <div class="stat-card">
-                <h4>Datos Faltantes</h4>
-                <div class="value" id="missingData">-</div>
-                <div class="unit">%</div>
-            </div>
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2 group shrink-0 mr-6">
+        <div class="w-7 h-7 rounded-lg bg-ocean-600 flex items-center justify-center">
+          <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M3 12a9 9 0 1018 0 9 9 0 00-18 0"/>
+          </svg>
         </div>
+        <span class="mono text-xs font-semibold tracking-widest text-ocean-300 uppercase group-hover:text-ocean-200 transition-colors hidden sm:block">ODS Explorer</span>
+      </a>
 
-        <!-- SECCIÓN DE FILTROS -->
-        <div class="filters-section" id="filtros">
-            <h3>Filtros de Búsqueda</h3>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="filter-group">
-                        <label for="countrySelect">País</label>
-                        <input type="text" class="form-control country-search mb-2" id="searchCountrySelect" placeholder="Buscar país..." data-target="countrySelect">
-                        <select class="form-select" id="countrySelect">
-                            <option value="">Seleccionar país...</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="filter-group">
-                        <label for="indicatorSelect">Indicador</label>
-                        <select class="form-select" id="indicatorSelect">
-                            <option value="">Seleccionar indicador...</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="filter-group">
-                        <label for="yearInput">Año (opcional)</label>
-                        <select class="form-select" id="yearInput">
-                            <option value="">Seleccionar año...</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <button class="btn btn-filter" onclick="applyFilters()">
-                Buscar Datos
-            </button>
-            <button class="btn btn-filter" style="background: var(--color-gray-medium);" onclick="resetFilters()">
-                Limpiar Filtros
-            </button>
+      <div class="h-5 w-px bg-slate-800 mr-6 shrink-0"></div>
+
+      <!-- Links -->
+      <nav class="flex items-center gap-1 flex-1 overflow-x-auto scrollbar-hide">
+
+        <a href="/" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+          Inicio
+        </a>
+
+        <a href="/dashboard" class="nav-link active-page flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+          Dashboard
+        </a>
+
+        <a href="/multidimensional" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
+          Modelo Multidimensional
+        </a>
+
+        <a href="/orange" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21a48.25 48.25 0 01-8.135-.687c-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg>
+          Orange
+        </a>
+
+        <a href="/spark" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+          Spark
+        </a>
+
+      </nav>
+
+      <!-- Stats badge -->
+      <div class="ml-4 shrink-0 hidden md:flex">
+        <div id="stats-badge" class="hidden items-center gap-2 bg-slate-800/60 border border-slate-700/50 rounded-full px-3 py-1.5 text-xs text-slate-400 mono">
+          <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+          <span id="badge-text">—</span>
         </div>
+      </div>
 
-        <!-- SECCIÓN DE DATOS -->
-        <div class="data-section" id="datos">
-            <h3>Resultados</h3>
-            <div id="dataContainer">
-                <div class="empty-state">
-                    <p>Selecciona filtros y haz clic en "Buscar Datos" para ver resultados</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECCIÓN DE COMPARACIÓN -->
-        <div class="comparison-section" id="comparacion">
-            <h3>Comparar Países</h3>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="filter-group">
-                        <label for="country1Select">Primer País</label>
-                        <input type="text" class="form-control country-search mb-2" id="searchCountry1Select" placeholder="Buscar país..." data-target="country1Select">
-                        <select class="form-select" id="country1Select">
-                            <option value="">Seleccionar país...</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="filter-group">
-                        <label for="country2Select">Segundo País</label>
-                        <input type="text" class="form-control country-search mb-2" id="searchCountry2Select" placeholder="Buscar país..." data-target="country2Select">
-                        <select class="form-select" id="country2Select">
-                            <option value="">Seleccionar país...</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="filter-group">
-                        <label for="yearCompareInput">Año de comparación</label>
-                        <select class="form-select" id="yearCompareInput">
-                            <option value="">Seleccionar año...</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4 mt-3">
-                    <div class="filter-group">
-                        <label for="indicatorCompare">Indicador a Comparar</label>
-                        <select class="form-select" id="indicatorCompare">
-                            <option value="">Seleccionar indicador...</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <button class="btn btn-filter" onclick="compareCountries()">
-                Comparar
-            </button>
-            <div id="comparisonResult" style="margin-top: 20px;"></div>
-        </div>
-
-        <!-- GRÁFICOS -->
-        <div id="chartsSection" class="charts-container" style="display: none;"></div>
     </div>
+  </header>
+  <!-- ═══ /NAV GLOBAL ═══ -->
 
-    <!-- FOOTER -->
-    <footer id="contacto">
-        <p>Dashboard ODS <span class="footer-divider">|</span> Datos del Banco Mundial</p>
-        <p style="font-size: 12px; color: #999;">Metodología SEMMA: Selección -> Exploración -> Modelado -> Visualización -> Evaluación</p>
-    </footer>
+  <div class="flex pt-14 min-h-screen">
 
-    <!-- SCRIPTS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <!-- ════════════════ SIDEBAR ════════════════ -->
+    <aside class="hidden lg:flex flex-col w-72 border-r border-slate-800/60 bg-slate-900/40 p-5 overflow-y-auto fixed top-14 bottom-0 gap-6">
 
-    <script>
-        // Variables globales
-        let currentChart = null;
-        let currentComparison = null;
+      <!-- FILTROS -->
+      <div>
+        <p class="mono text-xs text-slate-600 uppercase tracking-widest mb-4">Filtros de búsqueda</p>
 
-        // Inicializar dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            loadFilters();
-            loadStatistics();
-            setupCountrySearch();
-        });
+        <!-- País REQUERIDO -->
+        <div class="mb-3">
+          <label class="flex items-center justify-between text-xs mono uppercase tracking-wide mb-1.5">
+            <span class="text-slate-400">País <span class="text-red-400">*</span></span>
+            <span class="text-slate-700 normal-case tracking-normal font-normal">requerido</span>
+          </label>
+          <select id="country-select"
+            class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 pr-8 focus:outline-none focus:border-ocean-500 focus:ring-1 focus:ring-ocean-500/30 transition-all">
+            <option value="">— Selecciona un país —</option>
+            {% for c in countries %}
+            <option value="{{ c }}">{{ c }}</option>
+            {% endfor %}
+          </select>
+          <p id="err-country" class="hidden text-red-400 text-xs mono mt-1">Campo requerido</p>
+        </div>
 
-        // Cargar opciones de filtros
-        async function loadFilters() {
-            try {
-                const response = await fetch('/api/filters');
-                const data = await response.json();
+        <!-- Indicador REQUERIDO -->
+        <div class="mb-3">
+          <label class="flex items-center justify-between text-xs mono uppercase tracking-wide mb-1.5">
+            <span class="text-slate-400">Indicador <span class="text-red-400">*</span></span>
+            <span class="text-slate-700 normal-case tracking-normal font-normal">requerido</span>
+          </label>
+          <select id="indicator-select"
+            class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 pr-8 focus:outline-none focus:border-ocean-500 focus:ring-1 focus:ring-ocean-500/30 transition-all">
+            <option value="">— Selecciona indicador —</option>
+            {% for ind in indicators %}
+            <option value="{{ ind }}">{{ ind }}</option>
+            {% endfor %}
+          </select>
+          <p id="err-indicator" class="hidden text-red-400 text-xs mono mt-1">Campo requerido</p>
+        </div>
 
-                // Poblar selectores de países
-                const countries = [
-                    document.getElementById('countrySelect'),
-                    document.getElementById('country1Select'),
-                    document.getElementById('country2Select')
-                ];
+        <!-- Nivel de ingreso OPCIONAL -->
+        <div class="mb-3">
+          <label class="flex items-center justify-between text-xs mono uppercase tracking-wide mb-1.5">
+            <span class="text-slate-400">Nivel de ingreso</span>
+            <span class="text-slate-700 normal-case tracking-normal font-normal">opcional</span>
+          </label>
+          <select id="income-select"
+            class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 pr-8 focus:outline-none focus:border-ocean-500 focus:ring-1 focus:ring-ocean-500/30 transition-all">
+            <option value="">Todos los niveles</option>
+            <option value="H">🟢 Ingreso alto</option>
+            <option value="UM">🔵 Ingreso medio-alto</option>
+            <option value="LM">🟡 Ingreso medio-bajo</option>
+            <option value="L">🔴 Ingreso bajo</option>
+          </select>
+        </div>
 
-                countries.forEach(select => {
-                    data.countries.forEach(country => {
-                        const option = document.createElement('option');
-                        option.value = country;
-                        option.textContent = country;
-                        select.appendChild(option);
-                    });
-                });
+        <!-- Año OPCIONAL -->
+        <div class="mb-4">
+          <label class="flex items-center justify-between text-xs mono uppercase tracking-wide mb-1.5">
+            <span class="text-slate-400">Año</span>
+            <span class="text-slate-700 normal-case tracking-normal font-normal">opcional</span>
+          </label>
+          <select id="year-select"
+            class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 pr-8 focus:outline-none focus:border-ocean-500 focus:ring-1 focus:ring-ocean-500/30 transition-all">
+            <option value="">Todos los años</option>
+            {% for y in years %}
+            <option value="{{ y }}">{{ y }}</option>
+            {% endfor %}
+          </select>
+        </div>
 
-                // Poblar selector de indicadores
-                const years = [
-                    document.getElementById('yearInput'),
-                    document.getElementById('yearCompareInput')
-                ];
+        <button id="apply-btn"
+          class="w-full bg-ocean-600 hover:bg-ocean-500 text-white font-semibold text-sm py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+          </svg>
+          Consultar
+        </button>
+        <button id="clear-btn"
+          class="w-full mt-2 border border-slate-700 hover:border-slate-600 text-slate-400 hover:text-slate-300 font-medium text-sm py-2.5 rounded-xl transition-colors">
+          Limpiar
+        </button>
+      </div>
 
-                years.forEach(select => {
-                    data.years.forEach(year => {
-                        const option = document.createElement('option');
-                        option.value = year;
-                        option.textContent = year;
-                        select.appendChild(option);
-                    });
-                });
+      <!-- COMPARAR -->
+      <div class="border-t border-slate-800 pt-5">
+        <p class="mono text-xs text-slate-600 uppercase tracking-widest mb-4">Comparar países</p>
 
-                const indicators = [
-                    document.getElementById('indicatorSelect'),
-                    document.getElementById('indicatorCompare')
-                ];
+        <!-- País 1 -->
+        <div class="mb-3">
+          <label class="flex items-center justify-between text-xs mono uppercase tracking-wide mb-1.5">
+            <span class="text-slate-400">País 1 <span class="text-red-400">*</span></span>
+          </label>
+          <select id="compare-c1"
+            class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 pr-8 focus:outline-none focus:border-ocean-500 focus:ring-1 focus:ring-ocean-500/30 transition-all">
+            <option value="">— Selecciona país 1 —</option>
+            {% for c in countries %}
+            <option value="{{ c }}">{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
 
-                indicators.forEach(select => {
-                    data.indicators.forEach(indicator => {
-                        const option = document.createElement('option');
-                        option.value = indicator;
-                        option.textContent = indicator.substring(0, 60) + (indicator.length > 60 ? '...' : '');
-                        select.appendChild(option);
-                    });
-                });
-            } catch (error) {
-                console.error('Error cargando filtros:', error);
-            }
+        <!-- País 2 -->
+        <div class="mb-3">
+          <label class="flex items-center justify-between text-xs mono uppercase tracking-wide mb-1.5">
+            <span class="text-slate-400">País 2 <span class="text-red-400">*</span></span>
+          </label>
+          <select id="compare-c2"
+            class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 pr-8 focus:outline-none focus:border-ocean-500 focus:ring-1 focus:ring-ocean-500/30 transition-all">
+            <option value="">— Selecciona país 2 —</option>
+            {% for c in countries %}
+            <option value="{{ c }}">{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Indicador comparación -->
+        <div class="mb-4">
+          <label class="flex items-center justify-between text-xs mono uppercase tracking-wide mb-1.5">
+            <span class="text-slate-400">Indicador <span class="text-red-400">*</span></span>
+          </label>
+          <select id="compare-indicator"
+            class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 pr-8 focus:outline-none focus:border-ocean-500 focus:ring-1 focus:ring-ocean-500/30 transition-all">
+            <option value="">— Selecciona indicador —</option>
+            {% for ind in indicators %}
+            <option value="{{ ind }}">{{ ind }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Año comparación -->
+        <div class="mb-4">
+          <label class="flex items-center justify-between text-xs mono uppercase tracking-wide mb-1.5">
+            <span class="text-slate-400">Año</span>
+            <span class="text-slate-700 normal-case tracking-normal font-normal">opcional</span>
+          </label>
+          <select id="compare-year"
+            class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 pr-8 focus:outline-none focus:border-ocean-500 focus:ring-1 focus:ring-ocean-500/30 transition-all">
+            <option value="">Todos los años</option>
+            {% for y in years %}
+            <option value="{{ y }}">{{ y }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button id="compare-btn"
+          class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          Comparar
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- ════════════════ MAIN ════════════════ -->
+    <main class="flex-1 lg:ml-72 p-6 space-y-6">
+
+      <!-- Móvil filtros -->
+      <div class="lg:hidden bg-slate-900 border border-slate-800 rounded-2xl p-4">
+        <button id="mobile-filter-toggle" class="w-full flex items-center justify-between text-sm text-slate-300 font-medium">
+          <span class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-ocean-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M7 8h10M11 12h4"/>
+            </svg>
+            Filtros
+          </span>
+          <svg id="chevron-icon" class="w-4 h-4 text-slate-500 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div id="mobile-filters" class="hidden mt-4 space-y-3">
+          <select id="country-select-m" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 pr-8 focus:outline-none focus:border-ocean-500">
+            <option value="">— País —</option>
+            {% for c in countries %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+          </select>
+          <select id="indicator-select-m" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 pr-8 focus:outline-none focus:border-ocean-500">
+            <option value="">— Indicador —</option>
+            {% for ind in indicators %}<option value="{{ ind }}">{{ ind }}</option>{% endfor %}
+          </select>
+          <select id="year-select-m" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 pr-8 focus:outline-none focus:border-ocean-500">
+            <option value="">Todos los años</option>
+            {% for y in years %}<option value="{{ y }}">{{ y }}</option>{% endfor %}
+          </select>
+          <button id="apply-btn-m" class="w-full bg-ocean-600 hover:bg-ocean-500 text-white font-semibold text-sm py-2.5 rounded-xl transition-colors">Consultar</button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+          <p class="mono text-xs text-slate-600 uppercase tracking-widest mb-3">Registros</p>
+          <p class="text-3xl font-bold text-slate-100" id="kpi-records">—</p>
+          <p class="text-xs text-slate-600 mt-1">total dataset</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+          <p class="mono text-xs text-slate-600 uppercase tracking-widest mb-3">Indicadores</p>
+          <p class="text-3xl font-bold text-ocean-400" id="kpi-indicators">—</p>
+          <p class="text-xs text-slate-600 mt-1">disponibles</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+          <p class="mono text-xs text-slate-600 uppercase tracking-widest mb-3">Países</p>
+          <p class="text-3xl font-bold text-slate-100" id="kpi-countries">—</p>
+          <p class="text-xs text-slate-600 mt-1">en el dataset</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+          <p class="mono text-xs text-slate-600 uppercase tracking-widest mb-3">Datos faltantes</p>
+          <p class="text-3xl font-bold" id="kpi-missing">—</p>
+          <p class="text-xs text-slate-600 mt-1">% del total</p>
+        </div>
+      </div>
+
+      <!-- TARJETA PAÍS SELECCIONADO con bandera -->
+      <div id="country-card" class="hidden fade-in">
+        <div class="bg-gradient-to-br from-ocean-950/80 to-slate-900 border border-ocean-900/50 rounded-2xl p-6">
+          <div class="flex items-center gap-5">
+            <div class="flex-shrink-0 w-20 h-20 rounded-2xl bg-slate-800/70 border border-slate-700/40 flex items-center justify-center shadow-inner">
+              <span id="card-flag" class="flag-big">🌐</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="mono text-xs text-ocean-400 uppercase tracking-widest mb-1">País seleccionado</p>
+              <h2 id="card-country" class="text-2xl font-bold text-white truncate">—</h2>
+              <p id="card-indicator" class="text-sm text-slate-400 mt-0.5 truncate">—</p>
+              <div class="mt-2" id="income-badge-wrap"></div>
+            </div>
+            <div id="card-value-wrap" class="hidden flex-shrink-0 text-right bg-slate-800/50 rounded-xl px-5 py-3 border border-slate-700/40">
+              <p class="mono text-xs text-slate-600 uppercase tracking-widest mb-1">Valor</p>
+              <p id="card-value" class="text-3xl font-bold text-ocean-400">—</p>
+              <p id="card-year"  class="mono text-xs text-slate-600 mt-1">—</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESTADO VACÍO -->
+      <div id="empty-state" class="bg-slate-900/40 border border-dashed border-slate-800 rounded-2xl p-14 text-center">
+        <div class="w-14 h-14 rounded-2xl bg-slate-800/60 flex items-center justify-center mx-auto mb-4">
+          <svg class="w-7 h-7 text-slate-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5"/>
+          </svg>
+        </div>
+        <h3 class="font-semibold text-slate-400 mb-2">Sin datos que mostrar</h3>
+        <p class="text-sm text-slate-600 max-w-xs mx-auto">Selecciona un <strong class="text-slate-500">país</strong> y un <strong class="text-slate-500">indicador</strong> en el panel izquierdo, luego presiona <strong class="text-slate-500">Consultar</strong>.</p>
+      </div>
+
+      <!-- RESULTADOS -->
+      <div id="results-wrap" class="hidden space-y-6">
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <h3 class="font-semibold text-slate-100 text-sm">Comparación de registros</h3>
+                <p class="mono text-xs text-slate-600 mt-0.5" id="sub-bar">—</p>
+              </div>
+              <span class="mono text-xs bg-slate-800 text-slate-500 px-2.5 py-1 rounded-lg">Barras</span>
+            </div>
+            <div class="chart-canvas-wrap"><canvas id="barChart"></canvas></div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <h3 class="font-semibold text-slate-100 text-sm">Distribución de valores</h3>
+                <p class="mono text-xs text-slate-600 mt-0.5" id="sub-line">—</p>
+              </div>
+              <span class="mono text-xs bg-slate-800 text-slate-500 px-2.5 py-1 rounded-lg">Línea</span>
+            </div>
+            <div class="chart-canvas-wrap"><canvas id="lineChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Radar + Clasificación por ingreso -->
+        <div class="grid md:grid-cols-2 gap-6">
+
+          <!-- Gráfico radar -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <h3 class="font-semibold text-slate-100 text-sm">Perfil de indicadores</h3>
+                <p class="mono text-xs text-slate-600 mt-0.5" id="sub-radar">Radar por indicador</p>
+              </div>
+              <span class="mono text-xs bg-slate-800 text-slate-500 px-2.5 py-1 rounded-lg">Radar</span>
+            </div>
+            <div class="chart-canvas-radar"><canvas id="radarChart"></canvas></div>
+          </div>
+
+          <!-- Clasificación por nivel de ingreso -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <h3 class="font-semibold text-slate-100 text-sm">Clasificación por ingreso</h3>
+                <p class="mono text-xs text-slate-600 mt-0.5" id="sub-income">Banco Mundial</p>
+              </div>
+              <span class="mono text-xs bg-slate-800 text-slate-500 px-2.5 py-1 rounded-lg">Nivel</span>
+            </div>
+            <!-- Leyenda de niveles -->
+            <div class="grid grid-cols-2 gap-2 mb-5">
+              <div class="income-badge income-H">🟢 Ingreso alto</div>
+              <div class="income-badge income-UM">🔵 Medio-alto</div>
+              <div class="income-badge income-LM">🟡 Medio-bajo</div>
+              <div class="income-badge income-L">🔴 Ingreso bajo</div>
+            </div>
+            <!-- Distribución visual de los países del resultado -->
+            <div id="income-distribution" class="space-y-2">
+              <p class="text-slate-600 text-xs text-center py-4">Consulta datos para ver la distribución</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+            <div>
+              <h3 class="font-semibold text-slate-100 text-sm">Datos filtrados</h3>
+              <p class="mono text-xs text-slate-600 mt-0.5" id="tbl-subtitle">—</p>
+            </div>
+            <span class="mono text-xs bg-slate-800 text-slate-500 px-2.5 py-1 rounded-lg" id="row-count">0 filas</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-slate-800">
+                  <th class="text-left text-xs mono text-slate-600 uppercase tracking-wide px-6 py-3">País</th>
+                  <th class="text-left text-xs mono text-slate-600 uppercase tracking-wide px-6 py-3">Indicador</th>
+                  <th class="text-right text-xs mono text-slate-600 uppercase tracking-wide px-6 py-3">Valor</th>
+                  <th class="text-right text-xs mono text-slate-600 uppercase tracking-wide px-6 py-3">Estado</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /results-wrap -->
+
+
+      <!-- ══ RANKING TOP/BOTTOM ══ -->
+      <div id="ranking-section" class="hidden fade-in">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+
+          <!-- Header -->
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.25 9.71 2 12 2c2.291 0 4.545.25 6.75.721v1.515m0 0A6.003 6.003 0 0116.27 9.728M18.75 4.236V4.5a6.718 6.718 0 01-2.48 5.228"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-slate-100 text-sm">Ranking global</h3>
+                <p class="mono text-xs text-slate-600 mt-0.5" id="ranking-subtitle">Selecciona indicador y año</p>
+              </div>
+            </div>
+            <!-- Tabs top / bottom -->
+            <div class="flex items-center gap-1 bg-slate-800 rounded-xl p-1">
+              <button id="tab-top" onclick="switchTab('top')"
+                class="tab-btn active-tab mono text-xs px-4 py-1.5 rounded-lg transition-all">
+                🥇 Top 10
+              </button>
+              <button id="tab-bottom" onclick="switchTab('bottom')"
+                class="tab-btn mono text-xs px-4 py-1.5 rounded-lg transition-all text-slate-500">
+                📉 Bottom 10
+              </button>
+            </div>
+          </div>
+
+          <!-- ── FILTROS PROPIOS DEL RANKING ── -->
+          <div class="px-5 py-4 border-b border-slate-800 bg-slate-950/50">
+            <p class="mono text-xs text-slate-600 uppercase tracking-widest mb-3">Filtrar ranking</p>
+            <div class="flex flex-wrap gap-3 items-end">
+
+              <!-- Indicador (columna del CSV) -->
+              <div class="flex flex-col gap-1 flex-1 min-w-40">
+                <label class="mono text-xs text-slate-500 uppercase tracking-wide">
+                  Indicador <span class="text-red-400">*</span>
+                </label>
+                <select id="rank-indicator"
+                  class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-2 pr-8
+                         focus:outline-none focus:border-ocean-500 transition-all">
+                  <option value="">— Selecciona columna —</option>
+                  {% for ind in indicators %}
+                  <option value="{{ ind }}">{{ ind }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Año -->
+              <div class="flex flex-col gap-1 w-28">
+                <label class="mono text-xs text-slate-500 uppercase tracking-wide">Año</label>
+                <select id="rank-year"
+                  class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-2 pr-8
+                         focus:outline-none focus:border-ocean-500 transition-all">
+                  <option value="">Todos</option>
+                  {% for y in years %}
+                  <option value="{{ y }}">{{ y }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- N resultados -->
+              <div class="flex flex-col gap-1 w-28">
+                <label class="mono text-xs text-slate-500 uppercase tracking-wide">Mostrar</label>
+                <select id="rank-n"
+                  class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-2 pr-8
+                         focus:outline-none focus:border-ocean-500 transition-all">
+                  <option value="5">Top 5</option>
+                  <option value="10" selected>Top 10</option>
+                  <option value="15">Top 15</option>
+                  <option value="20">Top 20</option>
+                </select>
+              </div>
+
+              <!-- Botón -->
+              <button onclick="refreshRanking()"
+                class="bg-ocean-600 hover:bg-ocean-500 text-white font-semibold text-sm px-5 py-2 rounded-xl
+                       transition-colors flex items-center gap-2 shrink-0 h-9 self-end">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                </svg>
+                Buscar
+              </button>
+
+            </div>
+          </div>
+
+          <!-- Lista Top -->
+          <div id="ranking-top" class="divide-y divide-slate-800/50">
+            <div class="px-6 py-10 text-center text-slate-600 text-sm">
+              Selecciona un indicador y presiona <strong class="text-slate-500">Buscar</strong>
+            </div>
+          </div>
+          <!-- Lista Bottom -->
+          <div id="ranking-bottom" class="hidden divide-y divide-slate-800/50"></div>
+
+          <!-- Footer -->
+          <div class="flex items-center justify-between px-6 py-3 border-t border-slate-800 bg-slate-900/60">
+            <span class="mono text-xs text-slate-600" id="ranking-total">—</span>
+            <span class="mono text-xs text-slate-700" id="ranking-year-info">—</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- COMPARACIÓN -->
+      <div id="compare-section" class="hidden fade-in bg-slate-900 border-2 border-ocean-900/50 rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <div class="flex items-center gap-2 mb-0.5">
+              <h3 class="font-semibold text-slate-100">Comparación de países</h3>
+              <span id="cmp-year-badge" class="hidden mono text-xs bg-ocean-950 border border-ocean-800 text-ocean-400 px-2 py-0.5 rounded-full">—</span>
+            </div>
+            <p class="mono text-xs text-slate-600 mt-0.5" id="cmp-title">—</p>
+          </div>
+          <button id="close-compare" class="text-slate-600 hover:text-slate-400 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Cards con banderas -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="bg-slate-800/50 border border-slate-700/40 rounded-xl p-4 flex items-center gap-3">
+            <span id="cmp-flag1" class="flag-md">🌐</span>
+            <div class="min-w-0">
+              <p class="mono text-xs text-ocean-500 uppercase tracking-widest">País 1</p>
+              <p id="cmp-name1" class="font-semibold text-slate-200 text-sm truncate">—</p>
+            </div>
+          </div>
+          <div class="bg-slate-800/50 border border-slate-700/40 rounded-xl p-4 flex items-center gap-3">
+            <span id="cmp-flag2" class="flag-md">🌐</span>
+            <div class="min-w-0">
+              <p class="mono text-xs text-indigo-400 uppercase tracking-widest">País 2</p>
+              <p id="cmp-name2" class="font-semibold text-slate-200 text-sm truncate">—</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-canvas-wrap"><canvas id="compareChart"></canvas></div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-800 border border-slate-700 text-slate-200 text-sm px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2 max-w-sm">
+    <span id="toast-msg">—</span>
+  </div>
+
+  <script>
+  // ─────────────────────────────────────────────────────────────
+  // FORMAT NUMBER — abrevia valores grandes (PIB, millones, etc.)
+  // ─────────────────────────────────────────────────────────────
+  function formatNum(n) {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    const abs = Math.abs(n);
+    if (abs >= 1e12)  return (n / 1e12).toLocaleString('es', { maximumFractionDigits: 2 }) + ' B';
+    if (abs >= 1e9)   return (n / 1e9).toLocaleString('es',  { maximumFractionDigits: 2 }) + ' MM';
+    if (abs >= 1e6)   return (n / 1e6).toLocaleString('es',  { maximumFractionDigits: 2 }) + ' M';
+    if (abs >= 1e3)   return (n / 1e3).toLocaleString('es',  { maximumFractionDigits: 2 }) + ' K';
+    return n.toLocaleString('es', { maximumFractionDigits: 4 });
+  }
+
+  // Para etiquetas del eje Y en Chart.js
+  function formatAxis(val) { return formatNum(val); }
+
+  // ─────────────────────────────────────────────────────────────
+  // MAPA DE BANDERAS
+  // ─────────────────────────────────────────────────────────────
+  const FLAGS = {
+    'Afghanistan':'🇦🇫','Albania':'🇦🇱','Algeria':'🇩🇿','Angola':'🇦🇴','Argentina':'🇦🇷',
+    'Armenia':'🇦🇲','Australia':'🇦🇺','Austria':'🇦🇹','Azerbaijan':'🇦🇿','Bahrain':'🇧🇭',
+    'Bangladesh':'🇧🇩','Belarus':'🇧🇾','Belgium':'🇧🇪','Bolivia':'🇧🇴','Bosnia and Herzegovina':'🇧🇦',
+    'Botswana':'🇧🇼','Brazil':'🇧🇷','Bulgaria':'🇧🇬','Burkina Faso':'🇧🇫','Burundi':'🇧🇮',
+    'Cambodia':'🇰🇭','Cameroon':'🇨🇲','Canada':'🇨🇦','Chad':'🇹🇩','Chile':'🇨🇱',
+    'China':'🇨🇳','Colombia':'🇨🇴','Congo':'🇨🇬','Costa Rica':'🇨🇷','Croatia':'🇭🇷',
+    'Cuba':'🇨🇺','Cyprus':'🇨🇾','Czech Republic':'🇨🇿','Denmark':'🇩🇰','Dominican Republic':'🇩🇴',
+    'Ecuador':'🇪🇨','Egypt':'🇪🇬','El Salvador':'🇸🇻','Estonia':'🇪🇪','Ethiopia':'🇪🇹',
+    'Finland':'🇫🇮','France':'🇫🇷','Georgia':'🇬🇪','Germany':'🇩🇪','Ghana':'🇬🇭',
+    'Greece':'🇬🇷','Guatemala':'🇬🇹','Guinea':'🇬🇳','Haiti':'🇭🇹','Honduras':'🇭🇳',
+    'Hungary':'🇭🇺','Iceland':'🇮🇸','India':'🇮🇳','Indonesia':'🇮🇩','Iran':'🇮🇷',
+    'Iraq':'🇮🇶','Ireland':'🇮🇪','Israel':'🇮🇱','Italy':'🇮🇹','Jamaica':'🇯🇲',
+    'Japan':'🇯🇵','Jordan':'🇯🇴','Kazakhstan':'🇰🇿','Kenya':'🇰🇪','Kuwait':'🇰🇼',
+    'Latvia':'🇱🇻','Lebanon':'🇱🇧','Libya':'🇱🇾','Lithuania':'🇱🇹','Luxembourg':'🇱🇺',
+    'Madagascar':'🇲🇬','Malawi':'🇲🇼','Malaysia':'🇲🇾','Mali':'🇲🇱','Malta':'🇲🇹',
+    'Mauritania':'🇲🇷','Mexico':'🇲🇽','Moldova':'🇲🇩','Mongolia':'🇲🇳','Montenegro':'🇲🇪',
+    'Morocco':'🇲🇦','Mozambique':'🇲🇿','Myanmar':'🇲🇲','Namibia':'🇳🇦','Nepal':'🇳🇵',
+    'Netherlands':'🇳🇱','New Zealand':'🇳🇿','Nicaragua':'🇳🇮','Niger':'🇳🇪','Nigeria':'🇳🇬',
+    'North Korea':'🇰🇵','Norway':'🇳🇴','Oman':'🇴🇲','Pakistan':'🇵🇰','Panama':'🇵🇦',
+    'Paraguay':'🇵🇾','Peru':'🇵🇪','Philippines':'🇵🇭','Poland':'🇵🇱','Portugal':'🇵🇹',
+    'Qatar':'🇶🇦','Romania':'🇷🇴','Russia':'🇷🇺','Rwanda':'🇷🇼','Saudi Arabia':'🇸🇦',
+    'Senegal':'🇸🇳','Serbia':'🇷🇸','Sierra Leone':'🇸🇱','Singapore':'🇸🇬','Slovakia':'🇸🇰',
+    'Slovenia':'🇸🇮','Somalia':'🇸🇴','South Africa':'🇿🇦','South Korea':'🇰🇷','South Sudan':'🇸🇸',
+    'Spain':'🇪🇸','Sri Lanka':'🇱🇰','Sudan':'🇸🇩','Sweden':'🇸🇪','Switzerland':'🇨🇭',
+    'Syria':'🇸🇾','Taiwan':'🇹🇼','Tanzania':'🇹🇿','Thailand':'🇹🇭','Togo':'🇹🇬',
+    'Tunisia':'🇹🇳','Turkey':'🇹🇷','Uganda':'🇺🇬','Ukraine':'🇺🇦','United Arab Emirates':'🇦🇪',
+    'United Kingdom':'🇬🇧','United States':'🇺🇸','Uruguay':'🇺🇾','Uzbekistan':'🇺🇿',
+    'Venezuela':'🇻🇪','Vietnam':'🇻🇳','Yemen':'🇾🇪','Zambia':'🇿🇲','Zimbabwe':'🇿🇼',
+    // Español
+    'Alemania':'🇩🇪','Arabia Saudita':'🇸🇦','Argelia':'🇩🇿','Afganistán':'🇦🇫',
+    'Bélgica':'🇧🇪','Bolivia':'🇧🇴','Brasil':'🇧🇷','Canadá':'🇨🇦','Chile':'🇨🇱',
+    'China':'🇨🇳','Colombia':'🇨🇴','Corea del Norte':'🇰🇵','Corea del Sur':'🇰🇷',
+    'Cuba':'🇨🇺','Dinamarca':'🇩🇰','Ecuador':'🇪🇨','Egipto':'🇪🇬','España':'🇪🇸',
+    'Estados Unidos':'🇺🇸','Etiopía':'🇪🇹','Filipinas':'🇵🇭','Finlandia':'🇫🇮',
+    'Francia':'🇫🇷','Ghana':'🇬🇭','Grecia':'🇬🇷','Guatemala':'🇬🇹','Honduras':'🇭🇳',
+    'India':'🇮🇳','Indonesia':'🇮🇩','Irán':'🇮🇷','Irak':'🇮🇶','Irlanda':'🇮🇪',
+    'Israel':'🇮🇱','Italia':'🇮🇹','Japón':'🇯🇵','Jordania':'🇯🇴','Kazajistán':'🇰🇿',
+    'Kenia':'🇰🇪','Kuwait':'🇰🇼','Libia':'🇱🇾','Malasia':'🇲🇾','Marruecos':'🇲🇦',
+    'México':'🇲🇽','Nigeria':'🇳🇬','Noruega':'🇳🇴','Nueva Zelanda':'🇳🇿',
+    'Países Bajos':'🇳🇱','Pakistán':'🇵🇰','Panamá':'🇵🇦','Paraguay':'🇵🇾','Perú':'🇵🇪',
+    'Polonia':'🇵🇱','Portugal':'🇵🇹','Qatar':'🇶🇦','Reino Unido':'🇬🇧',
+    'República Dominicana':'🇩🇴','Rumania':'🇷🇴','Rusia':'🇷🇺','Senegal':'🇸🇳',
+    'Siria':'🇸🇾','Sudáfrica':'🇿🇦','Sudán':'🇸🇩','Suecia':'🇸🇪','Suiza':'🇨🇭',
+    'Tailandia':'🇹🇭','Tanzania':'🇹🇿','Túnez':'🇹🇳','Turquía':'🇹🇷','Ucrania':'🇺🇦',
+    'Uganda':'🇺🇬','Uruguay':'🇺🇾','Venezuela':'🇻🇪','Vietnam':'🇻🇳',
+  };
+
+  function getFlag(name) {
+    if (!name) return '🌐';
+    if (FLAGS[name]) return FLAGS[name];
+    const l = name.toLowerCase();
+    for (const [k, v] of Object.entries(FLAGS)) {
+      if (l.includes(k.toLowerCase()) || k.toLowerCase().includes(l)) return v;
+    }
+    return '🌐';
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // CHART SETUP
+  // ─────────────────────────────────────────────────────────────
+  Chart.defaults.color = '#64748b';
+  Chart.defaults.borderColor = '#1e293b';
+  Chart.defaults.font.family = "'Inter', sans-serif";
+  Chart.defaults.font.size = 11;
+
+  const C = {
+    blue: 'rgba(20,128,235,0.85)', blueBg: 'rgba(20,128,235,0.12)',
+    indigo: 'rgba(99,102,241,0.85)', indigoBg: 'rgba(99,102,241,0.12)',
+    teal: 'rgba(16,185,129,0.85)', tealBg: 'rgba(16,185,129,0.12)',
+  };
+
+  let barChart, lineChart, compareChart;
+
+  function initCharts() {
+    const base = {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${formatNum(ctx.parsed.y)}`
+          }
         }
-
-        // Configurar búsqueda en selects de país
-        function setupCountrySearch() {
-            document.querySelectorAll('.country-search').forEach(input => {
-                const targetId = input.dataset.target;
-                const target = document.getElementById(targetId);
-
-                input.addEventListener('input', () => {
-                    const query = input.value.toLowerCase();
-                    Array.from(target.options).forEach(option => {
-                        if (!option.value) {
-                            option.hidden = false;
-                            return;
-                        }
-                        option.hidden = query ? !option.value.toLowerCase().includes(query) : false;
-                    });
-                });
-            });
+      },
+      scales: {
+        x: { grid: { color: '#1e293b' }, ticks: { maxRotation: 30 } },
+        y: {
+          grid: { color: '#1e293b' }, beginAtZero: true,
+          ticks: { callback: formatAxis }
         }
+      }
+    };
+    barChart  = new Chart(document.getElementById('barChart'),  { type: 'bar',  data: { labels:[], datasets:[{ data:[], backgroundColor: C.blue,  borderRadius:6  }] }, options: JSON.parse(JSON.stringify(base)) });
+    lineChart = new Chart(document.getElementById('lineChart'), { type: 'line', data: { labels:[], datasets:[{ data:[], borderColor: C.teal, backgroundColor: C.tealBg, tension:0.4, fill:true, pointRadius:4 }] }, options: JSON.parse(JSON.stringify(base)) });
+  }
 
-        // Cargar estadísticas
-        async function loadStatistics() {
-            try {
-                const response = await fetch('/api/statistics');
-                const stats = await response.json();
+  // ─────────────────────────────────────────────────────────────
+  // STATS
+  // ─────────────────────────────────────────────────────────────
+  async function loadStats() {
+    try {
+      const s = await fetch('/api/statistics').then(r => r.json());
+      document.getElementById('kpi-records').textContent    = s.total_records?.toLocaleString() ?? '—';
+      document.getElementById('kpi-indicators').textContent = s.total_indicators ?? '—';
+      document.getElementById('kpi-countries').textContent  = s.countries ?? '—';
+      const miss = parseFloat(s.missing_data_percentage ?? 0).toFixed(1);
+      const el = document.getElementById('kpi-missing');
+      el.textContent = miss + '%';
+      el.className   = `text-3xl font-bold ${parseFloat(miss) > 20 ? 'text-amber-400' : 'text-green-400'}`;
+      document.getElementById('badge-text').textContent = `${s.total_records?.toLocaleString()} registros · ${s.countries} países`;
+      document.getElementById('stats-badge').classList.remove('hidden');
+    } catch(e) {}
+  }
 
-                document.getElementById('totalRecords').textContent = stats.total_records.toLocaleString('es-ES');
-                document.getElementById('totalIndicators').textContent = stats.total_indicators;
-                document.getElementById('totalCountries').textContent = stats.countries;
-                document.getElementById('missingData').textContent = stats.missing_data_percentage.toFixed(2);
-            } catch (error) {
-                console.error('Error cargando estadísticas:', error);
-            }
+  // ─────────────────────────────────────────────────────────────
+  // VALIDACIÓN
+  // ─────────────────────────────────────────────────────────────
+  function validate() {
+    const c = document.getElementById('country-select').value;
+    const i = document.getElementById('indicator-select').value;
+    let ok = true;
+
+    const setErr = (selId, errId, hasErr) => {
+      document.getElementById(selId).classList.toggle('field-error', hasErr);
+      document.getElementById(errId).classList.toggle('hidden', !hasErr);
+      if (hasErr) ok = false;
+    };
+    setErr('country-select',   'err-country',   !c);
+    setErr('indicator-select', 'err-indicator', !i);
+    return ok;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // LOAD DATA
+  // ─────────────────────────────────────────────────────────────
+  async function loadData() {
+    if (!validate()) { showToast('⚠️ Selecciona país e indicador'); return; }
+
+    const country   = document.getElementById('country-select').value;
+    const indicator = document.getElementById('indicator-select').value;
+    const year      = document.getElementById('year-select').value;
+    const income    = document.getElementById('income-select')?.value || '';
+
+    setBtnLoading(true);
+    try {
+      const p = new URLSearchParams({ country, indicator });
+      if (year) p.set('year', year);
+      const json = await fetch('/api/data?' + p).then(r => r.json());
+
+      if (!json.success || !json.data?.length) {
+        showToast('⚠️ Sin datos para los filtros aplicados');
+        return;
+      }
+      if (json.note) showToast('ℹ️ ' + json.note);
+
+      // Filtrar por nivel de ingreso si se seleccionó uno
+      if (income) {
+        json.data = json.data.filter(row => getIncome(row.country) === income);
+        json.rows = json.data.length;
+        if (!json.data.length) {
+          showToast(`⚠️ No hay países de ese nivel de ingreso en los resultados`);
+          return;
         }
+      }
 
-        // Aplicar filtros y cargar datos
-        async function applyFilters() {
-            const country = document.getElementById('countrySelect').value;
-            const indicator = document.getElementById('indicatorSelect').value;
-            const year = document.getElementById('yearInput').value;
+      updateCountryCard(country, indicator, year, json.data);
 
-            if (!country && !indicator) {
-                alert('Por favor, selecciona al menos un país o indicador');
-                return;
+      document.getElementById('empty-state').classList.add('hidden');
+      document.getElementById('results-wrap').classList.remove('hidden');
+      document.getElementById('results-wrap').classList.add('fade-in');
+
+      renderCharts(json.data, indicator);
+      renderTable(json.data);
+      loadRanking(indicator, year);
+      renderRadar(json.data, country, indicator);
+      renderIncomeDistribution(json.data);
+      renderIncomeBadge(country);
+
+      document.getElementById('row-count').textContent   = json.rows + ' filas';
+      document.getElementById('tbl-subtitle').textContent = `${country} · ${indicator}${year ? ' · ' + year : ''}`;
+      document.getElementById('sub-bar').textContent     = indicator;
+      document.getElementById('sub-line').textContent    = `${country}${year ? ' · ' + year : ''}`;
+
+    } catch(e) {
+      showToast('❌ Error al obtener datos');
+      console.error(e);
+    } finally {
+      setBtnLoading(false);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // COUNTRY CARD
+  // ─────────────────────────────────────────────────────────────
+  function updateCountryCard(country, indicator, year, data) {
+    document.getElementById('card-flag').textContent      = getFlag(country);
+    document.getElementById('card-country').textContent   = country;
+    document.getElementById('card-indicator').textContent = indicator;
+
+    const first = data[0];
+    const key   = first?.values ? Object.keys(first.values)[0] : null;
+    const val   = key ? first.values[key] : null;
+    const wrap  = document.getElementById('card-value-wrap');
+
+    if (val !== null && val !== undefined && !isNaN(parseFloat(val))) {
+      document.getElementById('card-value').textContent = formatNum(parseFloat(val));
+      document.getElementById('card-year').textContent  = year ? `Año ${year}` : 'Promedio';
+      wrap.classList.remove('hidden');
+    } else {
+      wrap.classList.add('hidden');
+    }
+
+    document.getElementById('country-card').classList.remove('hidden');
+    document.getElementById('country-card').classList.add('fade-in');
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // CHARTS
+  // ─────────────────────────────────────────────────────────────
+  function renderCharts(data, indicator) {
+    const labels = data.map(d => d.country);
+    const key    = data[0]?.values ? Object.keys(data[0].values)[0] : null;
+    const vals   = key ? data.map(d => d.values[key] ?? 0) : [];
+
+    barChart.data.labels = lineChart.data.labels = labels;
+    barChart.data.datasets[0].data  = vals;
+    barChart.data.datasets[0].label = indicator;
+    lineChart.data.datasets[0].data  = vals;
+    lineChart.data.datasets[0].label = indicator;
+    barChart.update(); lineChart.update();
+  }
+
+  function clearCharts() {
+    [barChart, lineChart].forEach(c => {
+      c.data.labels = [];
+      c.data.datasets[0].data = [];
+      c.update();
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // TABLE
+  // ─────────────────────────────────────────────────────────────
+  function renderTable(data) {
+    const tbody = document.getElementById('tbl-body');
+    tbody.innerHTML = '';
+    data.forEach(row => {
+      Object.entries(row.values || {}).forEach(([key, val]) => {
+        const tr  = document.createElement('tr');
+        tr.className = 'border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors';
+        const num = parseFloat(val);
+        const disp = isNaN(num) ? '—' : formatNum(num);
+        const badge = isNaN(num)
+          ? '<span class="mono text-xs text-slate-600 bg-slate-800 px-2 py-0.5 rounded-md">N/D</span>'
+          : '<span class="mono text-xs text-green-400 bg-green-950/40 border border-green-900/30 px-2 py-0.5 rounded-md">OK</span>';
+        tr.innerHTML = `
+          <td class="px-6 py-3">
+            <span class="flex items-center gap-2 text-slate-200 font-medium">
+              <span>${getFlag(row.country)}</span><span>${row.country}</span>
+            </span>
+          </td>
+          <td class="px-6 py-3 text-slate-400 mono text-xs">${key}</td>
+          <td class="px-6 py-3 text-right text-ocean-300 mono font-semibold">${disp}</td>
+          <td class="px-6 py-3 text-right">${badge}</td>`;
+        tbody.appendChild(tr);
+      });
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // COMPARAR
+  // ─────────────────────────────────────────────────────────────
+  async function runCompare() {
+    const c1   = document.getElementById('compare-c1').value;
+    const c2   = document.getElementById('compare-c2').value;
+    const ind  = document.getElementById('compare-indicator').value;
+    const year = document.getElementById('compare-year').value;   // ← año independiente
+
+    const ids = ['compare-c1','compare-c2','compare-indicator'];
+    ids.forEach(id => {
+      document.getElementById(id).classList.toggle('field-error', !document.getElementById(id).value);
+    });
+
+    if (!c1 || !c2 || !ind) { showToast('⚠️ Selecciona ambos países e indicador'); return; }
+    ids.forEach(id => document.getElementById(id).classList.remove('field-error'));
+
+    try {
+      const json = await fetch('/api/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country1: c1, country2: c2, indicator: ind, year: year || undefined })
+      }).then(r => r.json());
+
+      // Obtener TODOS los valores de cada país (pueden ser múltiples filas/años)
+      const data1 = json.country1?.data ?? [];
+      const data2 = json.country2?.data ?? [];
+
+      // Si hay datos por año (sin filtro de año), usar el Año como eje X
+      // Si hay un año fijo, usar el nombre del indicador como eje X
+      let labels, vals1, vals2;
+
+      if (!year && data1.length > 1) {
+        // Múltiples filas → usar index de fila como label (o año si está en values)
+        labels = data1.map((_, i) => `Registro ${i+1}`);
+        const key1 = data1[0]?.values ? Object.keys(data1[0].values)[0] : null;
+        const key2 = data2[0]?.values ? Object.keys(data2[0].values)[0] : null;
+        vals1 = data1.map(d => key1 ? (d.values[key1] ?? 0) : 0);
+        vals2 = data2.map(d => key2 ? (d.values[key2] ?? 0) : 0);
+        // Igualar longitudes
+        const maxLen = Math.max(vals1.length, vals2.length);
+        while (vals1.length < maxLen) vals1.push(0);
+        while (vals2.length < maxLen) vals2.push(0);
+        while (labels.length < maxLen) labels.push(`Registro ${labels.length+1}`);
+      } else {
+        // Un valor por país → comparar lado a lado con nombre del indicador
+        const keys1   = data1[0]?.values ? Object.keys(data1[0].values) : [];
+        const keys2   = data2[0]?.values ? Object.keys(data2[0].values) : [];
+        const allKeys = [...new Set([...keys1, ...keys2])].slice(0, 6);
+        // Abreviar etiquetas largas de columna
+        labels = allKeys.map(k => k.length > 20 ? k.substring(0, 18) + '…' : k);
+        vals1  = allKeys.map(k => data1[0]?.values?.[k] ?? 0);
+        vals2  = allKeys.map(k => data2[0]?.values?.[k] ?? 0);
+      }
+
+      // Cards de países
+      document.getElementById('cmp-flag1').textContent = getFlag(c1);
+      document.getElementById('cmp-name1').textContent = c1;
+      document.getElementById('cmp-flag2').textContent = getFlag(c2);
+      document.getElementById('cmp-name2').textContent = c2;
+      document.getElementById('cmp-title').textContent =
+        `${c1} vs ${c2} · ${ind}${year ? ' · ' + year : ''}`;
+
+      // Mostrar año en badge si aplica
+      const yearBadge = document.getElementById('cmp-year-badge');
+      if (year) {
+        yearBadge.textContent = year;
+        yearBadge.classList.remove('hidden');
+      } else {
+        yearBadge.classList.add('hidden');
+      }
+
+      const sec = document.getElementById('compare-section');
+      sec.classList.remove('hidden');
+      sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      if (compareChart) compareChart.destroy();
+      compareChart = new Chart(document.getElementById('compareChart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: c1, data: vals1, backgroundColor: C.blue,   borderRadius: 5 },
+            { label: c2, data: vals2, backgroundColor: C.indigo, borderRadius: 5 },
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true, labels: { color: '#94a3b8', boxWidth: 12 } },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.dataset.label}: ${formatNum(ctx.parsed.y)}`
+              }
             }
-
-            try {
-                const params = new URLSearchParams();
-                if (country) params.append('country', country);
-                if (indicator) params.append('indicator', indicator);
-                if (year) params.append('year', year);
-
-                const response = await fetch(`/api/data?${params}`);
-                const result = await response.json();
-
-                if (result.success && result.data.length > 0) {
-                    displayData(result.data);
-                    displayChart(result.data, indicator || country);
-                } else {
-                    document.getElementById('dataContainer').innerHTML = `
-                        <div class="empty-state">
-                            <p>No se encontraron datos con los criterios especificados</p>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al cargar datos');
-            }
+          },
+          scales: {
+            x: { grid: { color: '#1e293b' }, ticks: { maxRotation: 35, font: { size: 10 } } },
+            y: { grid: { color: '#1e293b' }, beginAtZero: true, ticks: { callback: formatAxis } }
+          }
         }
+      });
+    } catch(e) {
+      showToast('❌ Error al comparar países');
+      console.error(e);
+    }
+  }
 
-        // Mostrar datos en tabla
-        function displayData(data) {
-            if (!data || data.length === 0) return;
 
-            let html = '<div class="table-wrapper"><table class="table"><thead><tr>';
 
-            // Headers
-            html += '<th>País/Región</th>';
-            const firstRow = data[0];
-            for (const key in firstRow.values) {
-                html += `<th>${key.substring(0, 30)}</th>`;
+  // ─────────────────────────────────────────────────────────────
+  // CLASIFICACIÓN POR INGRESO — Banco Mundial
+  // Fuente: https://datahelpdesk.worldbank.org/knowledgebase/articles/906519
+  // H=Alto, UM=Medio-alto, LM=Medio-bajo, L=Bajo, UN=Sin clasificar
+  // ─────────────────────────────────────────────────────────────
+  const INCOME = {
+    // Ingreso Alto
+    'Andorra':'H','Australia':'H','Austria':'H','Bahrain':'H','Belgium':'H',
+    'Brunei':'H','Canada':'H','Chile':'H','Croatia':'H','Cyprus':'H',
+    'Czech Republic':'H','Denmark':'H','Estonia':'H','Finland':'H','France':'H',
+    'Germany':'H','Greece':'H','Hungary':'H','Iceland':'H','Ireland':'H',
+    'Israel':'H','Italy':'H','Japan':'H','Kuwait':'H','Latvia':'H',
+    'Lithuania':'H','Luxembourg':'H','Malta':'H','Netherlands':'H','New Zealand':'H',
+    'Norway':'H','Oman':'H','Panama':'H','Poland':'H','Portugal':'H',
+    'Qatar':'H','Romania':'H','Saudi Arabia':'H','Singapore':'H','Slovakia':'H',
+    'Slovenia':'H','South Korea':'H','Spain':'H','Sweden':'H','Switzerland':'H',
+    'Taiwan':'H','Trinidad and Tobago':'H','United Arab Emirates':'H',
+    'United Kingdom':'H','United States':'H','Uruguay':'H',
+    // Medio-alto
+    'Albania':'UM','Algeria':'UM','Argentina':'UM','Armenia':'UM','Azerbaijan':'UM',
+    'Belarus':'UM','Belize':'UM','Bosnia and Herzegovina':'UM','Botswana':'UM',
+    'Brazil':'UM','Bulgaria':'UM','China':'UM','Colombia':'UM','Costa Rica':'UM',
+    'Cuba':'UM','Dominican Republic':'UM','Ecuador':'UM','Fiji':'UM','Gabon':'UM',
+    'Georgia':'UM','Guatemala':'UM','Iran':'UM','Iraq':'UM','Jamaica':'UM',
+    'Jordan':'UM','Kazakhstan':'UM','Libya':'UM','Malaysia':'UM','Maldives':'UM',
+    'Marshall Islands':'UM','Mexico':'UM','Montenegro':'UM','Namibia':'UM',
+    'North Macedonia':'UM','Paraguay':'UM','Peru':'UM','Russia':'UM',
+    'Serbia':'UM','South Africa':'UM','Sri Lanka':'UM','Suriname':'UM',
+    'Thailand':'UM','Tonga':'UM','Tunisia':'UM','Turkey':'UM','Turkmenistan':'UM',
+    // Medio-bajo
+    'Angola':'LM','Bangladesh':'LM','Benin':'LM','Bhutan':'LM','Bolivia':'LM',
+    'Cambodia':'LM','Cameroon':'LM','Cape Verde':'LM','Congo':'LM',
+    'Côte d\'Ivoire':'LM','Djibouti':'LM','Egypt':'LM','El Salvador':'LM',
+    'Eswatini':'LM','Ghana':'LM','Honduras':'LM','India':'LM','Indonesia':'LM',
+    'Kenya':'LM','Kiribati':'LM','Kyrgyzstan':'LM','Laos':'LM','Lesotho':'LM',
+    'Mauritania':'LM','Micronesia':'LM','Mongolia':'LM','Morocco':'LM',
+    'Myanmar':'LM','Nepal':'LM','Nicaragua':'LM','Nigeria':'LM','Pakistan':'LM',
+    'Papua New Guinea':'LM','Philippines':'LM','Senegal':'LM','Tanzania':'LM',
+    'Timor-Leste':'LM','Ukraine':'LM','Uzbekistan':'LM','Vanuatu':'LM',
+    'Vietnam':'LM','Zambia':'LM','Zimbabwe':'LM',
+    // Bajo
+    'Afghanistan':'L','Burkina Faso':'L','Burundi':'L','Central African Republic':'L',
+    'Chad':'L','Democratic Republic of the Congo':'L','Eritrea':'L','Ethiopia':'L',
+    'Gambia':'L','Guinea':'L','Guinea-Bissau':'L','Haiti':'L','Liberia':'L',
+    'Madagascar':'L','Malawi':'L','Mali':'L','Mozambique':'L','Niger':'L',
+    'Rwanda':'L','Sierra Leone':'L','Somalia':'L','South Sudan':'L','Sudan':'L',
+    'Syria':'L','Togo':'L','Uganda':'L','Yemen':'L',
+    // Español
+    'Alemania':'H','Arabia Saudita':'H','Bélgica':'H','Canadá':'H','Chile':'H',
+    'Corea del Sur':'H','Dinamarca':'H','España':'H','Estados Unidos':'H',
+    'Finlandia':'H','Francia':'H','Grecia':'H','Irlanda':'H','Israel':'H',
+    'Italia':'H','Japón':'H','Kuwait':'H','Luxemburgo':'H','Noruega':'H',
+    'Nueva Zelanda':'H','Países Bajos':'H','Polonia':'H','Portugal':'H',
+    'Qatar':'H','Reino Unido':'H','Suecia':'H','Suiza':'H',
+    'Argentina':'UM','Bolivia':'LM','Brasil':'UM','China':'UM','Colombia':'UM',
+    'Ecuador':'UM','Egipto':'LM','Filipinas':'LM','Ghana':'LM','Guatemala':'UM',
+    'Honduras':'LM','India':'LM','Indonesia':'LM','Irán':'UM','Iraq':'UM',
+    'Jamaica':'UM','Jordania':'UM','Kazajistán':'UM','Kenia':'LM','Libia':'UM',
+    'Malasia':'UM','Marruecos':'LM','México':'UM','Nigeria':'LM','Pakistán':'LM',
+    'Panamá':'UM','Paraguay':'UM','Perú':'UM','República Dominicana':'UM',
+    'Rusia':'UM','Senegal':'LM','Sudáfrica':'UM','Sudán':'L','Tailandia':'UM',
+    'Tanzania':'LM','Túnez':'UM','Turquía':'UM','Ucrania':'LM','Uganda':'L',
+    'Uruguay':'H','Venezuela':'UM','Vietnam':'LM',
+    'Afganistán':'L','Etiopía':'L','Haití':'L','Mali':'L','Mozambique':'L',
+    'Níger':'L','Somalia':'L','Siria':'L','Yemen':'L',
+  };
+
+  const INCOME_META = {
+    H:  { label: 'Ingreso alto',      cls: 'income-H',  dot: '🟢' },
+    UM: { label: 'Ingreso medio-alto', cls: 'income-UM', dot: '🔵' },
+    LM: { label: 'Ingreso medio-bajo', cls: 'income-LM', dot: '🟡' },
+    L:  { label: 'Ingreso bajo',       cls: 'income-L',  dot: '🔴' },
+    UN: { label: 'Sin clasificar',     cls: 'income-UN', dot: '⚪' },
+  };
+
+  function getIncome(countryName) {
+    if (!countryName) return 'UN';
+    if (INCOME[countryName]) return INCOME[countryName];
+    const l = countryName.toLowerCase();
+    for (const [k, v] of Object.entries(INCOME)) {
+      if (l.includes(k.toLowerCase()) || k.toLowerCase().includes(l)) return v;
+    }
+    return 'UN';
+  }
+
+  function renderIncomeBadge(country) {
+    const code = getIncome(country);
+    const m    = INCOME_META[code];
+    const wrap = document.getElementById('income-badge-wrap');
+    if (!wrap) return;
+    wrap.innerHTML = `<span class="income-badge ${m.cls}">${m.dot} ${m.label}</span>`;
+  }
+
+  function renderIncomeDistribution(data) {
+    const el = document.getElementById('income-distribution');
+    if (!el) return;
+
+    // Contar países por nivel
+    const counts = { H:0, UM:0, LM:0, L:0, UN:0 };
+    data.forEach(row => {
+      const code = getIncome(row.country);
+      counts[code] = (counts[code] || 0) + 1;
+    });
+    const total = data.length;
+    if (!total) { el.innerHTML = '<p class="text-slate-600 text-xs text-center py-4">Sin datos</p>'; return; }
+
+    const ORDER = ['H','UM','LM','L','UN'];
+    const barColors = {
+      H: 'bg-emerald-500', UM: 'bg-sky-500', LM: 'bg-amber-400', L: 'bg-rose-500', UN: 'bg-slate-600'
+    };
+
+    el.innerHTML = ORDER.filter(k => counts[k] > 0).map(code => {
+      const m   = INCOME_META[code];
+      const pct = Math.round(counts[code] / total * 100);
+      return `
+        <div class="flex items-center gap-3">
+          <span class="income-badge ${m.cls} shrink-0 w-28 justify-center">${m.dot} ${m.label}</span>
+          <div class="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden">
+            <div class="${barColors[code]} h-2 rounded-full transition-all duration-700" style="width:${pct}%"></div>
+          </div>
+          <span class="mono text-xs text-slate-400 w-14 text-right shrink-0">${counts[code]} (${pct}%)</span>
+        </div>`;
+    }).join('');
+
+    // Actualizar subtítulo
+    const dominant = ORDER.filter(k=>counts[k]>0).sort((a,b)=>counts[b]-counts[a])[0];
+    if (dominant) {
+      document.getElementById('sub-income').textContent =
+        `Mayoría: ${INCOME_META[dominant].label}`;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // RADAR CHART
+  // ─────────────────────────────────────────────────────────────
+  let radarChart = null;
+
+  function renderRadar(data, country, indicator) {
+    // Toma hasta 8 indicadores (columnas de valores) del primer registro
+    const first = data[0];
+    if (!first?.values) return;
+
+    const entries = Object.entries(first.values).filter(([,v]) => v !== null && !isNaN(parseFloat(v)));
+    if (entries.length < 2) {
+      // No hay suficientes ejes para radar — mostrar mensaje
+      const canvas = document.getElementById('radarChart');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      document.getElementById('sub-radar').textContent = 'Necesita 2+ indicadores';
+      return;
+    }
+
+    // Limitar a 8 ejes para legibilidad
+    const sliced   = entries.slice(0, 8);
+    const labels   = sliced.map(([k]) => k.length > 18 ? k.substring(0,16)+'…' : k);
+    const rawVals  = sliced.map(([,v]) => parseFloat(v));
+
+    // Normalizar 0-100 para que todos los ejes sean comparables
+    // (los valores brutos de PIB vs. % de alfabetización no son comparables sin normalizar)
+    const maxV = Math.max(...rawVals.map(Math.abs));
+    const vals = maxV > 0 ? rawVals.map(v => Math.abs(v) / maxV * 100) : rawVals;
+
+    if (radarChart) radarChart.destroy();
+
+    radarChart = new Chart(document.getElementById('radarChart'), {
+      type: 'radar',
+      data: {
+        labels,
+        datasets: [{
+          label: country,
+          data: vals,
+          backgroundColor: 'rgba(20,128,235,0.15)',
+          borderColor:     'rgba(20,128,235,0.9)',
+          borderWidth: 2,
+          pointBackgroundColor: '#1480eb',
+          pointBorderColor:     '#fff',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const orig = rawVals[ctx.dataIndex];
+                return ` ${labels[ctx.dataIndex]}: ${formatNum(orig)}`;
+              }
             }
-            html += '</tr></thead><tbody>';
-
-            // Rows
-            data.forEach(row => {
-                html += `<tr><td>${row.country}</td>`;
-                for (const key in row.values) {
-                    const value = row.values[key];
-                    html += `<td>${value !== null ? parseFloat(value).toFixed(2) : '-'}</td>`;
-                }
-                html += '</tr>';
-            });
-
-            html += '</tbody></table></div>';
-            if (firstRow.note) {
-                html += `<div class="alert alert-info mt-3">${firstRow.note}</div>`;
-            }
-            document.getElementById('dataContainer').innerHTML = html;
+          }
+        },
+        scales: {
+          r: {
+            backgroundColor: 'transparent',
+            grid:        { color: 'rgba(255,255,255,0.06)' },
+            angleLines:  { color: 'rgba(255,255,255,0.08)' },
+            pointLabels: { color: '#64748b', font: { size: 10, family: "'Inter', sans-serif" } },
+            ticks: {
+              display: false,
+              backdropColor: 'transparent',
+            },
+            suggestedMin: 0,
+            suggestedMax: 100,
+          }
         }
+      }
+    });
 
-        // Mostrar gráfico
-        function displayChart(data, title) {
-            const ctx = document.querySelector('#chartsSection');
-            ctx.innerHTML = '';
+    document.getElementById('sub-radar').textContent =
+      `${country} · ${entries.length} indicadores normalizados`;
+  }
 
-            if (!data || data.length === 0) return;
+  // ─────────────────────────────────────────────────────────────
+  // RANKING TOP / BOTTOM
+  // ─────────────────────────────────────────────────────────────
+  let rankingData = { top: [], bottom: [] };
+  let activeTab   = 'top';
 
-            const chartDiv = document.createElement('div');
-            chartDiv.className = 'chart-wrapper';
-            chartDiv.innerHTML = `
-                <h4>Visualización de ${title}</h4>
-                <canvas id="mainChart"></canvas>
-            `;
-            ctx.appendChild(chartDiv);
-            document.getElementById('chartsSection').style.display = 'grid';
+  // Llamado desde loadData() — pre-llena los selects del ranking
+  // con los mismos valores de la búsqueda principal, pero NO ejecuta el fetch.
+  // El usuario decide cuándo buscar con el botón "Buscar" del ranking.
+  function loadRanking(indicator, year) {
+    const sec = document.getElementById('ranking-section');
+    sec.classList.remove('hidden');
 
-            const firstRow = data[0];
-            const indicators = Object.keys(firstRow.values).filter(key => key !== 'Año' && key !== 'Año ');
-            const countries = data.map(d => d.country);
+    const rInd  = document.getElementById('rank-indicator');
+    const rYear = document.getElementById('rank-year');
 
-            const chartCanvas = document.getElementById('mainChart');
-
-            if (currentChart) currentChart.destroy();
-
-            currentChart = new Chart(chartCanvas, {
-                type: 'bar',
-                data: {
-                    labels: countries,
-                    datasets: indicators.slice(0, 1).map((ind, idx) => ({
-                        label: ind.substring(0, 30),
-                        data: data.map(d => d.values[ind] || 0),
-                        backgroundColor: 'rgba(100, 181, 246, 0.8)',
-                        borderColor: 'rgba(66, 165, 245, 1)',
-                        borderWidth: 2
-                    }))
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: { position: 'top' }
-                    }
-                }
-            });
+    // Pre-llenar indicador: buscar opción exacta
+    if (rInd && indicator) {
+      let matched = false;
+      for (const opt of rInd.options) {
+        if (opt.value === indicator) { rInd.value = indicator; matched = true; break; }
+      }
+      // Si no hay match exacto, buscar parcial
+      if (!matched) {
+        for (const opt of rInd.options) {
+          if (opt.value && opt.value.toLowerCase().includes(indicator.toLowerCase())) {
+            rInd.value = opt.value; break;
+          }
         }
+      }
+    }
 
-        // Comparar países
-        async function compareCountries() {
-            const country1 = document.getElementById('country1Select').value;
-            const country2 = document.getElementById('country2Select').value;
-            const year = document.getElementById('yearCompareInput').value;
-            const indicator = document.getElementById('indicatorCompare').value;
+    // Pre-llenar año
+    if (rYear) rYear.value = year || '';
+  }
 
-            if (!country1 || !country2 || !indicator) {
-                alert('Por favor, selecciona ambos países y un indicador');
-                return;
-            }
+  // Llamado desde el botón "Buscar" del ranking — lee sus propios selects
+  async function refreshRanking() {
+    const indicator = document.getElementById('rank-indicator')?.value || '';
+    const year      = document.getElementById('rank-year')?.value      || '';
+    const n         = parseInt(document.getElementById('rank-n')?.value || '10');
 
-            try {
-                const response = await fetch('/api/compare', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ country1, country2, year, indicator })
-                });
+    if (!indicator) {
+      const sel = document.getElementById('rank-indicator');
+      sel.style.borderColor = '#ef4444';
+      sel.style.boxShadow   = '0 0 0 1px rgba(239,68,68,0.3)';
+      setTimeout(() => { sel.style.borderColor = ''; sel.style.boxShadow = ''; }, 1800);
+      showToast('⚠️ Selecciona un indicador para el ranking');
+      return;
+    }
 
-                const comparison = await response.json();
+    await _doRankingFetch(indicator, year, n);
+  }
 
-                let html = '<div class="alert alert-info">✓ Comparación realizada exitosamente</div>';
-                html += '<div class="row">';
+  async function _doRankingFetch(indicator, year, n = 10) {
+    // Loading state en las listas
+    document.getElementById('ranking-top').innerHTML =
+      '<div class="px-6 py-8 text-center text-slate-600 text-sm animate-pulse">Cargando ranking...</div>';
+    document.getElementById('ranking-bottom').innerHTML = '';
 
-                for (const [key, value] of Object.entries(comparison)) {
-                    html += `<div class="col-md-6"><h5>${value.name}</h5>`;
-                    if (value.data && value.data.length > 0) {
-                        html += '<ul class="list-group">';
-                        value.data.forEach(row => {
-                            for (const [k, v] of Object.entries(row.values)) {
-                                html += `<li class="list-group-item">${k}: ${v !== null ? parseFloat(v).toFixed(2) : '-'}</li>`;
-                            }
-                            if (row.note) {
-                                html += `<li class="list-group-item list-group-item-warning">${row.note}</li>`;
-                            }
-                        });
-                        html += '</ul>';
-                    } else {
-                        html += '<div class="alert alert-warning">No se encontró información suficiente para este país.</div>';
-                    }
-                    html += '</div>';
-                }
+    const p = new URLSearchParams({ indicator, n });
+    if (year) p.set('year', year);
 
-                html += '</div>';
-                document.getElementById('comparisonResult').innerHTML = html;
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al comparar');
-            }
-        }
+    try {
+      const json = await fetch('/api/ranking?' + p).then(r => r.json());
 
-        // Limpiar filtros
-        function resetFilters() {
-            document.getElementById('countrySelect').value = '';
-            document.getElementById('indicatorSelect').value = '';
-            document.getElementById('yearInput').value = '';
-            document.getElementById('dataContainer').innerHTML = `
-                <div class="empty-state">
-                    <p>Selecciona filtros y haz clic en "Buscar Datos" para ver resultados</p>
-                </div>
-            `;
-            document.getElementById('chartsSection').style.display = 'none';
-        }
-    </script>
+      if (json.error) {
+        document.getElementById('ranking-top').innerHTML =
+          `<div class="px-6 py-8 text-center text-rose-400 text-sm">${json.error}</div>`;
+        return;
+      }
+
+      rankingData = { top: json.top || [], bottom: json.bottom || [] };
+
+      // Cabecera informativa
+      const yearLabel = (year && year !== 'todos') ? year : 'Promedio todos los años';
+      document.getElementById('ranking-subtitle').textContent = json.indicator || indicator;
+      document.getElementById('ranking-total').textContent =
+        `${json.total} países con datos`;
+      document.getElementById('ranking-year-info').textContent = yearLabel;
+
+      renderRankingList('top');
+      renderRankingList('bottom');
+      switchTab(activeTab);
+
+    } catch(e) {
+      console.error('Ranking error:', e);
+      document.getElementById('ranking-top').innerHTML =
+        '<div class="px-6 py-8 text-center text-rose-400 text-sm">Error al cargar el ranking</div>';
+    }
+  }
+
+  function renderRankingList(type) {
+    const list = rankingData[type] || [];
+    const el   = document.getElementById(`ranking-${type}`);
+
+    if (!list.length) {
+      el.innerHTML = '<div class="px-6 py-8 text-center text-slate-600 text-sm">Sin datos disponibles</div>';
+      return;
+    }
+
+    const maxVal = Math.max(...list.map(r => Math.abs(r.value)));
+    const medals = ['🥇', '🥈', '🥉'];
+
+    el.innerHTML = list.map((row, i) => {
+      const pct      = maxVal > 0 ? (Math.abs(row.value) / maxVal * 100) : 0;
+      const medal    = (type === 'top' && i < 3) ? medals[i] : '';
+      const rankNum  = `<span class="mono text-xs font-bold ${type === 'top' ? 'text-ocean-400' : 'text-rose-400'} w-6 text-right shrink-0">${i + 1}</span>`;
+      const barColor = type === 'top'
+        ? 'background: linear-gradient(90deg, #1480eb, #3b9ef8)'
+        : 'background: linear-gradient(90deg, #e11d48, #fb7185)';
+
+      const selectedCountry = document.getElementById('country-select').value;
+      const isSelected = selectedCountry &&
+        row.country.toLowerCase().includes(selectedCountry.toLowerCase());
+      const rowBg = isSelected ? 'bg-ocean-950/50 border-l-2 border-ocean-500' : '';
+
+      const incCode = getIncome(row.country);
+      const incMeta = INCOME_META[incCode];
+      const incDot  = incCode !== 'UN'
+        ? `<span class="income-badge ${incMeta.cls} py-0 px-1.5" style="font-size:10px">${incMeta.dot}</span>`
+        : '';
+
+      return `<div class="rank-row flex items-center gap-3 px-5 py-3 hover:bg-slate-800/40 transition-colors ${rowBg}"
+                   style="animation-delay:${i*40}ms" title="${row.country}: ${formatNum(row.value)}">
+        ${rankNum}
+        <span class="text-base w-5 text-center shrink-0">${medal || ''}</span>
+        <span class="text-xl leading-none shrink-0">${getFlag(row.country)}</span>
+        <div class="flex-1 min-w-0 flex items-center gap-1.5">
+          <span class="text-sm text-slate-200 truncate font-medium">${row.country}</span>
+          ${incDot}
+        </div>
+        <div class="flex items-center gap-3 shrink-0 w-44">
+          <div class="rank-bar-wrap">
+            <div class="rank-bar" style="${barColor}; width:${pct.toFixed(1)}%"></div>
+          </div>
+          <span class="mono text-xs text-slate-400 text-right w-20 shrink-0">${formatNum(row.value)}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function switchTab(tab) {
+    activeTab = tab;
+    document.getElementById('ranking-top').classList.toggle('hidden',    tab !== 'top');
+    document.getElementById('ranking-bottom').classList.toggle('hidden', tab !== 'bottom');
+    document.getElementById('tab-top').classList.toggle('active-tab',    tab === 'top');
+    document.getElementById('tab-bottom').classList.toggle('active-tab', tab === 'bottom');
+    document.getElementById('tab-top').classList.toggle('text-slate-500',    tab !== 'top');
+    document.getElementById('tab-bottom').classList.toggle('text-slate-500', tab !== 'bottom');
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // UTILS
+  // ─────────────────────────────────────────────────────────────
+  let toastTimer;
+  function showToast(msg) {
+    document.getElementById('toast-msg').textContent = msg;
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 4500);
+  }
+
+  function setBtnLoading(on) {
+    const btn = document.getElementById('apply-btn');
+    btn.disabled = on;
+    btn.innerHTML = on
+      ? 'Consultando...'
+      : `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/></svg> Consultar`;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // EVENTS
+  // ─────────────────────────────────────────────────────────────
+  document.getElementById('apply-btn').addEventListener('click', loadData);
+  document.getElementById('apply-btn-m')?.addEventListener('click', loadData);
+  document.getElementById('compare-btn').addEventListener('click', runCompare);
+  document.getElementById('close-compare').addEventListener('click', () => {
+    document.getElementById('compare-section').classList.add('hidden');
+  });
+
+  document.getElementById('clear-btn').addEventListener('click', () => {
+    ['country-select','indicator-select','year-select',
+     'country-select-m','indicator-select-m','year-select-m'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.value = ''; el.classList.remove('field-error'); }
+    });
+    ['err-country','err-indicator'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    document.getElementById('country-card').classList.add('hidden');
+    document.getElementById('empty-state').classList.remove('hidden');
+    document.getElementById('results-wrap').classList.add('hidden');
+    document.getElementById('ranking-section').classList.add('hidden');
+    if (radarChart) { radarChart.destroy(); radarChart = null; }
+    const incDiv = document.getElementById('income-distribution');
+    if (incDiv) incDiv.innerHTML = '<p class="text-slate-600 text-xs text-center py-4">Consulta datos para ver la distribución</p>';
+    const badgeWrap = document.getElementById('income-badge-wrap');
+    if (badgeWrap) badgeWrap.innerHTML = '';
+    clearCharts();
+  });
+
+  // Limpiar error en tiempo real
+  ['country-select','indicator-select'].forEach((id, i) => {
+    document.getElementById(id)?.addEventListener('change', () => {
+      document.getElementById(id).classList.remove('field-error');
+      document.getElementById(['err-country','err-indicator'][i]).classList.add('hidden');
+    });
+  });
+  ['compare-c1','compare-c2','compare-indicator','compare-year'].forEach(id => {
+    document.getElementById(id)?.addEventListener('change', () =>
+      document.getElementById(id)?.classList.remove('field-error'));
+  });
+
+  // Móvil
+  document.getElementById('mobile-filter-toggle')?.addEventListener('click', () => {
+    const p = document.getElementById('mobile-filters');
+    const c = document.getElementById('chevron-icon');
+    p.classList.toggle('hidden');
+    c.style.transform = p.classList.contains('hidden') ? '' : 'rotate(180deg)';
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // INIT
+  // ─────────────────────────────────────────────────────────────
+  initCharts();
+  loadStats();
+  // NO se hace fetch automático — espera que el usuario seleccione filtros
+  </script>
 </body>
 </html>
