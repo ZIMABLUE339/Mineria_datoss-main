@@ -1,8 +1,3 @@
-"""
-Dashboard ODS - Flask Application
-Metodología SEMMA: Selección, Exploración, Modelado, Visualización, Evaluación
-"""
-
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import json
