@@ -63,6 +63,21 @@
     .nav-link.active-page { color: #7dd3fc; background: rgba(20,128,235,0.12); }
     .scrollbar-hide { scrollbar-width: none; }
     .scrollbar-hide::-webkit-scrollbar { display: none; }
+    /* Interpretación / análisis */
+    .insight-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid #1e293b; }
+    .insight-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .insight-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .insight-text { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+    .insight-text strong { color: #e2e8f0; font-weight: 500; }
+    .insight-tag { display: inline-flex; align-items: center; font-size: 10px; font-family: 'JetBrains Mono',monospace; font-weight: 600; padding: 2px 7px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+    .insight-tag-up      { background: rgba(16,185,129,.15); color: #34d399; border: 1px solid rgba(16,185,129,.2); }
+    .insight-tag-down    { background: rgba(248,113,113,.15); color: #fca5a5; border: 1px solid rgba(248,113,113,.2); }
+    .insight-tag-neutral { background: rgba(100,116,139,.15); color: #94a3b8; border: 1px solid rgba(100,116,139,.2); }
+    .conclusion-block { background: rgba(20,128,235,.08); border-left: 3px solid #1480eb; border-radius: 0 12px 12px 0; padding: 12px 14px; font-size: 13px; color: #94a3b8; line-height: 1.65; margin-top: 12px; }
+    .conclusion-block strong { color: #e2e8f0; font-weight: 500; }
+    @keyframes interpretFadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    .interp-fade { animation: interpretFadeIn .4s ease both; }
+
     /* Radar chart */
     .chart-canvas-radar { position: relative; height: 320px; }
 
@@ -514,6 +529,51 @@
           </div>
         </div>
 
+
+        <!-- ══ INTERPRETACIÓN AUTOMÁTICA ══ -->
+        <div id="interpretation-section" class="hidden fade-in">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(20,128,235,.12); border:1px solid rgba(20,128,235,.2)">
+                  <svg class="w-4 h-4 text-ocean-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-slate-100 text-sm">Análisis e interpretación</h3>
+                  <p class="mono text-xs text-slate-600 mt-0.5" id="interp-subtitle">Generado automáticamente</p>
+                </div>
+              </div>
+              <span class="mono text-xs bg-slate-800 text-slate-500 px-2.5 py-1 rounded-lg">SEMMA · Assess</span>
+            </div>
+
+            <!-- Loading state -->
+            <div id="interp-loading" class="px-6 py-8 text-center hidden">
+              <div class="inline-flex items-center gap-2 text-slate-600 text-sm">
+                <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                </svg>
+                Analizando datos...
+              </div>
+            </div>
+
+            <!-- Insights -->
+            <div id="interp-insights" class="px-6 py-4 divide-y divide-slate-800/40 hidden"></div>
+
+            <!-- Conclusión -->
+            <div id="interp-conclusion-wrap" class="px-6 pb-5 hidden">
+              <div class="conclusion-block">
+                <strong>Conclusión: </strong>
+                <span id="interp-conclusion"></span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div><!-- /results-wrap -->
 
 
@@ -868,6 +928,7 @@
       renderRadar(json.data, country, indicator);
       renderIncomeDistribution(json.data);
       renderIncomeBadge(country);
+      loadInterpretation(country, indicator, year);
 
       document.getElementById('row-count').textContent   = json.rows + ' filas';
       document.getElementById('tbl-subtitle').textContent = `${country} · ${indicator}${year ? ' · ' + year : ''}`;
@@ -1069,6 +1130,83 @@
   }
 
 
+
+
+  // ─────────────────────────────────────────────────────────────
+  // INTERPRETACIÓN AUTOMÁTICA
+  // ─────────────────────────────────────────────────────────────
+
+  async function loadInterpretation(country, indicator, year) {
+    const section  = document.getElementById('interpretation-section');
+    const loading  = document.getElementById('interp-loading');
+    const insights = document.getElementById('interp-insights');
+    const conclWrap= document.getElementById('interp-conclusion-wrap');
+
+    section.classList.remove('hidden');
+    loading.classList.remove('hidden');
+    insights.classList.add('hidden');
+    conclWrap.classList.add('hidden');
+    insights.innerHTML = '';
+
+    const p = new URLSearchParams({ country, indicator });
+    if (year) p.set('year', year);
+
+    try {
+      const json = await fetch('/api/interpretation?' + p).then(r => r.json());
+
+      if (json.error) {
+        loading.classList.add('hidden');
+        insights.classList.remove('hidden');
+        insights.innerHTML = `<div class="py-6 text-center text-slate-600 text-sm">${json.error}</div>`;
+        return;
+      }
+
+      loading.classList.add('hidden');
+
+      // Renderizar insights
+      const DOT_COLORS = {
+        position: '#1480eb',
+        trend:    '#1D9E75',
+        regional: '#EF9F27',
+        outlier:  '#E24B4A',
+      };
+
+      const insightRows = (json.insights || []).map((ins, i) => {
+        const dotColor = DOT_COLORS[ins.type] || '#64748b';
+        const tagHtml  = ins.tag
+          ? `<span class="insight-tag insight-tag-${ins.tag_type}">${ins.tag}</span>` : '';
+        const extraHtml = ins.extra_tag
+          ? `<span class="insight-tag insight-tag-${ins.extra_tag_type}">${ins.extra_tag}</span>` : '';
+        return `
+          <div class="insight-item interp-fade" style="animation-delay:${i * 80}ms">
+            <div class="insight-dot" style="background:${dotColor}"></div>
+            <div class="insight-text">
+              <strong>${ins.title}:</strong> ${ins.text}${tagHtml}${extraHtml}
+            </div>
+          </div>`;
+      }).join('');
+
+      insights.innerHTML = insightRows || '<div class="py-4 text-center text-slate-600 text-sm">Sin suficientes datos para analizar</div>';
+      insights.classList.remove('hidden');
+
+      // Subtítulo
+      document.getElementById('interp-subtitle').textContent =
+        `${country} · ${indicator}${year ? ' · ' + year : ''}`;
+
+      // Conclusión
+      if (json.conclusion) {
+        document.getElementById('interp-conclusion').textContent = json.conclusion;
+        conclWrap.classList.remove('hidden');
+        conclWrap.classList.add('interp-fade');
+      }
+
+    } catch(e) {
+      loading.classList.add('hidden');
+      insights.classList.remove('hidden');
+      insights.innerHTML = '<div class="py-6 text-center text-slate-600 text-sm">Error al generar el análisis</div>';
+      console.error('Interpretation error:', e);
+    }
+  }
 
   // ─────────────────────────────────────────────────────────────
   // CLASIFICACIÓN POR INGRESO — Banco Mundial
@@ -1478,6 +1616,7 @@
     document.getElementById('empty-state').classList.remove('hidden');
     document.getElementById('results-wrap').classList.add('hidden');
     document.getElementById('ranking-section').classList.add('hidden');
+    document.getElementById('interpretation-section').classList.add('hidden');
     if (radarChart) { radarChart.destroy(); radarChart = null; }
     const incDiv = document.getElementById('income-distribution');
     if (incDiv) incDiv.innerHTML = '<p class="text-slate-600 text-xs text-center py-4">Consulta datos para ver la distribución</p>';
