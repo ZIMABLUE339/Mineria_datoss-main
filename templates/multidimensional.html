@@ -1,139 +1,872 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Modelo Multidimensional — ODS Explorer</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Inter', sans-serif; background: #0b1120; color: #e2e8f0; }
-    .mono { font-family: 'JetBrains Mono', monospace; }
-    .nav-link { color: #64748b; text-decoration: none; }
-    .nav-link:hover { color: #e2e8f0; background: rgba(255,255,255,0.05); }
-    .nav-link.active-page { color: #a78bfa; background: rgba(20,128,235,0.12); }
-    .scrollbar-hide { scrollbar-width: none; }
-    .scrollbar-hide::-webkit-scrollbar { display: none; }
-    .bg-grid {
-      background-image:
-        linear-gradient(rgba(59,158,248,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(59,158,248,0.04) 1px, transparent 1px);
-      background-size: 40px 40px;
-    }
-    @keyframes pulse-slow { 0%,100%{opacity:1} 50%{opacity:.5} }
-    .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-    .fade-up { animation: fadeUp 0.6s ease both; }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Modelo Multidimensional — ODS Explorer</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:      #0b1120;
+    --card:    #111827;
+    --border:  #1f2937;
+    --accent:  #3b82f6;
+    --accent2: #6366f1;
+    --text:    #e2e8f0;
+    --muted:   #6b7280;
+    --green:   #10b981;
+    --orange:  #f59e0b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; }
+
+  /* NAV */
+  .top-nav {
+    background: #0f172a;
+    border-bottom: 1px solid var(--border);
+    padding: .6rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .top-nav .brand { font-size: .75rem; font-weight: 700; letter-spacing: .1em; color: #94a3b8; text-transform: uppercase; text-decoration: none; }
+  .top-nav nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: .8rem;
+    padding: .3rem .7rem;
+    border-radius: 5px;
+    transition: background .15s, color .15s;
+  }
+  .top-nav nav a:hover  { background: #1f2937; color: var(--text); }
+  .top-nav nav a.active { background: #1e3a5f; color: #60a5fa; }
+  .db-badge {
+    margin-left: auto;
+    font-size: .72rem;
+    padding: .2rem .7rem;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .db-ok  { background: #052e16; color: #4ade80; border: 1px solid #166534; }
+  .db-err { background: #450a0a; color: #f87171; border: 1px solid #991b1b; }
+
+  /* HEADER */
+  .page-header {
+    background: linear-gradient(135deg, #111827 0%, #0b1120 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 2rem 1.5rem;
+  }
+  .page-header h1 { font-size: 1.4rem; font-weight: 700; }
+  .page-header p  { color: var(--muted); font-size: .85rem; margin-top: .4rem; max-width: 680px; line-height: 1.6; }
+  .req-list { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .8rem; }
+  .req-badge {
+    font-size: .7rem;
+    padding: .2rem .6rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: #111827;
+  }
+  .req-badge.done { border-color: #166534; color: #4ade80; background: #052e16; }
+
+  /* SCHEMA SVG */
+  .schema-section {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    padding-bottom: .4rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .schema-wrap { overflow-x: auto; }
+
+  /* KPIs */
+  .kpi-section { padding: 1.2rem 2rem; border-bottom: 1px solid var(--border); }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .75rem; }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .9rem 1rem;
+    text-align: center;
+  }
+  .kpi-card .val { font-size: 1.5rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .kpi-card .lbl { font-size: .7rem; color: var(--muted); margin-top: .2rem; }
+
+  /* OLAP SECTION */
+  .olap-section { padding: 1.5rem 2rem; }
+  .tab-bar { display: flex; gap: .3rem; flex-wrap: wrap; margin-bottom: 0; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+  .tab-btn {
+    font-size: .76rem;
+    font-weight: 600;
+    padding: .45rem 1rem;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+    position: relative;
+    top: 1px;
+  }
+  .tab-btn:hover  { background: var(--card); color: var(--text); border-color: var(--border); }
+  .tab-btn.active { background: var(--card); color: var(--accent); border-color: var(--border); border-bottom-color: var(--card); }
+
+  .tab-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 8px 8px 8px;
+    padding: 1.25rem;
+    display: none;
+  }
+  .tab-panel.active { display: block; }
+
+  .panel-title { font-size: .9rem; font-weight: 700; margin-bottom: .2rem; }
+  .panel-subtitle {
+    font-size: .78rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    padding-bottom: .75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-subtitle strong { color: #94a3b8; }
+
+  /* CONTROLS */
+  .ctrl-row { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 1rem; align-items: flex-end; }
+  .ctrl-group { display: flex; flex-direction: column; gap: .25rem; }
+  .ctrl-group label { font-size: .7rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .ctrl-group select,
+  .ctrl-group input[type=number] {
+    background: #0b1120;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 5px;
+    padding: .35rem .65rem;
+    font-size: .8rem;
+    min-width: 160px;
+  }
+  .ctrl-group select:focus,
+  .ctrl-group input:focus { outline: 1px solid var(--accent); }
+  .btn-run {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: .4rem 1.1rem;
+    font-size: .78rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: .03em;
+    transition: opacity .15s;
+  }
+  .btn-run:hover { opacity: .85; }
+
+  /* CHART */
+  .chart-wrap {
+    background: #0b1120;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    min-height: 280px;
+    position: relative;
+  }
+  .chart-wrap canvas { max-height: 280px; }
+
+  /* TABLE */
+  .tbl-wrap { overflow-x: auto; }
+  .olap-tbl { width: 100%; border-collapse: collapse; font-size: .78rem; }
+  .olap-tbl th {
+    background: #0b1120;
+    color: var(--muted);
+    padding: .45rem .75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: .68rem;
+    letter-spacing: .06em;
+    white-space: nowrap;
+  }
+  .olap-tbl td { padding: .4rem .75rem; border-bottom: 1px solid #1a2030; }
+  .olap-tbl tr:hover td { background: #111827; }
+  .olap-tbl td.num { text-align: right; font-variant-numeric: tabular-nums; color: #93c5fd; }
+  .olap-tbl td.rank-num { text-align: center; font-weight: 800; color: var(--orange); }
+
+  /* SQL BLOCK */
+  .sql-block {
+    background: #0b1120;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: .75rem 1rem;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: .72rem;
+    color: #94a3b8;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .sql-block .kw  { color: #60a5fa; }
+  .sql-block .fn  { color: #34d399; }
+  .sql-block .str { color: #fbbf24; }
+  .sql-block .cm  { color: #4b5563; }
+
+  /* SPINNER */
+  .spinner-wrap { display: flex; justify-content: center; align-items: center; min-height: 200px; }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* EMPTY */
+  .empty-msg { text-align: center; padding: 2rem; color: var(--muted); font-size: .82rem; }
+
+  @media (max-width: 600px) {
+    .page-header, .olap-section, .schema-section, .kpi-section { padding: 1rem; }
+    .tab-btn { font-size: .7rem; padding: .35rem .7rem; }
+  }
+</style>
 </head>
-<body class="min-h-screen">
+<body>
 
-  <!-- ═══ NAV GLOBAL ═══ -->
-  <header class="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/60">
-    <div class="h-14 flex items-center px-6 gap-0 max-w-full">
-      <a href="/" class="flex items-center gap-2 group shrink-0 mr-6">
-        <div class="w-7 h-7 rounded-lg bg-ocean-600 flex items-center justify-center">
-          <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path d="M3 12a9 9 0 1018 0 9 9 0 00-18 0"/>
-          </svg>
-        </div>
-        <span class="mono text-xs font-semibold tracking-widest text-ocean-300 uppercase hidden sm:block">ODS Explorer</span>
-      </a>
-      <div class="h-5 w-px bg-slate-800 mr-6 shrink-0"></div>
-      <nav class="flex items-center gap-1 flex-1 overflow-x-auto scrollbar-hide">
-        <a href="/" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
-          Inicio
-        </a>
-        <a href="/dashboard" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
-          Dashboard
-        </a>
-        <a href="/multidimensional" class="nav-link active-page flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
-          Modelo Multidimensional
-        </a>
-        <a href="/orange" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21a48.25 48.25 0 01-8.135-.687c-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg>
-          Orange
-        </a>
-        <a href="/spark" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
-          Spark
-        </a>
-      </nav>
-    </div>
-  </header>
-  <!-- ═══ /NAV GLOBAL ═══ -->
+<!-- NAV -->
+<header class="top-nav">
+  <a href="/" class="brand">ODS Explorer</a>
+  <nav>
+    <a href="/">Inicio</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/multidimensional" class="active">Modelo Multidimensional</a>
+    <a href="/orange">Orange</a>
+    <a href="/spark">Spark</a>
+  </nav>
+  <span class="db-badge db-err" id="db-badge">Verificando conexion...</span>
+</header>
 
-  <!-- CONTENIDO -->
-  <main class="pt-14 min-h-screen bg-grid flex items-center justify-center px-6">
-    <div class="max-w-2xl w-full text-center py-24">
+<!-- HEADER -->
+<div class="page-header">
+  <h1>Nivel 2 — Modelo Multidimensional</h1>
+  <p>
+    Análisis OLAP de indicadores de Desarrollo Sostenible (Banco Mundial). Se implementó un esquema
+    estrella sobre SQL Server con 4 dimensiones y una tabla de hechos, poblado mediante un proceso
+    ETL desde el dataset ODS.csv (13,130 registros, 202 países, 1960–2024).
+  </p>
+  <div class="req-list">
+    <span class="req-badge done">Proceso de negocio analizado</span>
+    <span class="req-badge done">Hechos y dimensiones identificados</span>
+    <span class="req-badge done">Modelo estrella diseñado</span>
+    <span class="req-badge done">ETL implementado</span>
+    <span class="req-badge done">Consultas OLAP activas</span>
+    <span class="req-badge done">Integrado en Flask</span>
+  </div>
+</div>
 
-      <!-- Icono / badge -->
-      <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 fade-up"
-           style="background: #7c3aed20; border: 1px solid #7c3aed30;">
-        <span class="text-4xl">🧊</span>
-      </div>
+<!-- MODELO ESTRELLA -->
+<div class="schema-section">
+  <div class="section-title">Modelo Estrella — ODS_Multidimensional (SQL Server)</div>
+  <div class="schema-wrap">
+    <svg viewBox="0 0 820 400" width="820" height="400" xmlns="http://www.w3.org/2000/svg" style="min-width:600px">
+      <rect width="820" height="400" fill="#0b1120"/>
 
-      <!-- Badge "próximamente" -->
-      <div class="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6 fade-up"
-           style="background:#7c3aed15; border:1px solid #7c3aed25; animation-delay:.1s">
-        <span class="w-2 h-2 rounded-full animate-pulse-slow" style="background:#7c3aed"></span>
-        <span class="mono text-xs uppercase tracking-widest" style="color:#7c3aed">En construcción · Próximamente</span>
-      </div>
+      <!-- FACT -->
+      <rect x="295" y="140" width="230" height="120" rx="8" fill="#0f1f3d" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="410" y="163" text-anchor="middle" font-size="12" font-weight="700" fill="#60a5fa" font-family="Segoe UI,sans-serif">fact_indicadores</text>
+      <line x1="305" y1="170" x2="515" y2="170" stroke="#1f2937" stroke-width="1"/>
+      <text x="308" y="185" font-size="10" fill="#6b7280" font-family="Segoe UI,sans-serif">id_hecho   BIGINT PK</text>
+      <text x="308" y="199" font-size="10" fill="#6b7280" font-family="Segoe UI,sans-serif">id_tiempo  INT FK</text>
+      <text x="308" y="213" font-size="10" fill="#6b7280" font-family="Segoe UI,sans-serif">id_pais    INT FK</text>
+      <text x="308" y="227" font-size="10" fill="#6b7280" font-family="Segoe UI,sans-serif">id_indicador INT FK</text>
+      <text x="308" y="241" font-size="10" fill="#e2e8f0" font-family="Segoe UI,sans-serif">valor      FLOAT</text>
 
-      <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight fade-up" style="animation-delay:.15s">
-        Modelo Multidimensional
-      </h1>
+      <!-- DIM TIEMPO -->
+      <rect x="290" y="10" width="240" height="100" rx="8" fill="#0f2318" stroke="#10b981" stroke-width="1.5"/>
+      <text x="410" y="32" text-anchor="middle" font-size="12" font-weight="700" fill="#34d399" font-family="Segoe UI,sans-serif">dim_tiempo</text>
+      <line x1="300" y1="39" x2="520" y2="39" stroke="#1f2937" stroke-width="1"/>
+      <text x="303" y="54"  font-size="10" fill="#6b7280" font-family="Segoe UI,sans-serif">id_tiempo   INT PK  (año)</text>
+      <text x="303" y="68"  font-size="10" fill="#e2e8f0" font-family="Segoe UI,sans-serif">decada      VARCHAR</text>
+      <text x="303" y="82"  font-size="10" fill="#e2e8f0" font-family="Segoe UI,sans-serif">periodo     VARCHAR</text>
+      <text x="303" y="96"  font-size="10" fill="#e2e8f0" font-family="Segoe UI,sans-serif">es_siglo_xxi BIT</text>
+      <line x1="410" y1="110" x2="410" y2="140" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
 
-      <p class="text-slate-400 text-lg leading-relaxed mb-10 fade-up" style="animation-delay:.2s">
-        Análisis multidimensional de los Objetivos de Desarrollo Sostenible usando técnicas avanzadas de minería de datos para descubrir patrones ocultos entre indicadores.
+      <!-- DIM REGION -->
+      <rect x="10" y="90" width="210" height="70" rx="8" fill="#1a1033" stroke="#8b5cf6" stroke-width="1.5"/>
+      <text x="115" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="#a78bfa" font-family="Segoe UI,sans-serif">dim_region</text>
+      <line x1="20" y1="119" x2="210" y2="119" stroke="#1f2937" stroke-width="1"/>
+      <text x="23" y="134" font-size="10" fill="#6b7280" font-family="Segoe UI,sans-serif">id_region    INT PK</text>
+      <text x="23" y="148" font-size="10" fill="#e2e8f0" font-family="Segoe UI,sans-serif">nombre_region VARCHAR</text>
+      <line x1="220" y1="155" x2="295" y2="185" stroke="#8b5cf6" stroke-width="1.2" stroke-dasharray="4,3"/>
+
+      <!-- DIM PAIS -->
+      <rect x="10" y="200" width="210" height="120" rx="8" fill="#1f1207" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="115" y="222" text-anchor="middle" font-size="12" font-weight="700" fill="#fbbf24" font-family="Segoe UI,sans-serif">dim_pais</text>
+      <line x1="20" y1="229" x2="210" y2="229" stroke="#1f2937" stroke-width="1"/>
+      <text x="23" y="244" font-size="10" fill="#6b7280" font-family="Segoe UI,sans-serif">id_pais       INT PK</text>
+      <text x="23" y="258" font-size="10" fill="#e2e8f0" font-family="Segoe UI,sans-serif">nombre_pais   VARCHAR</text>
+      <text x="23" y="272" font-size="10" fill="#e2e8f0" font-family="Segoe UI,sans-serif">codigo_iso2   VARCHAR</text>
+      <text x="23" y="286" font-size="10" fill="#6b7280" font-family="Segoe UI,sans-serif">id_region     INT FK</text>
+      <text x="23" y="300" font-size="10" fill="#e2e8f0" font-family="Segoe UI,sans-serif">coordenadas, afiliacion</text>
+      <line x1="220" y1="245" x2="295" y2="200" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+      <!-- DIM INDICADOR -->
+      <rect x="600" y="130" width="210" height="130" rx="8" fill="#071a1f" stroke="#06b6d4" stroke-width="1.5"/>
+      <text x="705" y="152" text-anchor="middle" font-size="12" font-weight="700" fill="#22d3ee" font-family="Segoe UI,sans-serif">dim_indicador</text>
+      <line x1="610" y1="159" x2="800" y2="159" stroke="#1f2937" stroke-width="1"/>
+      <text x="613" y="174" font-size="10" fill="#6b7280" font-family="Segoe UI,sans-serif">id_indicador INT PK</text>
+      <text x="613" y="188" font-size="10" fill="#e2e8f0" font-family="Segoe UI,sans-serif">nombre       VARCHAR</text>
+      <text x="613" y="202" font-size="10" fill="#e2e8f0" font-family="Segoe UI,sans-serif">categoria    VARCHAR</text>
+      <text x="613" y="216" font-size="10" fill="#6b7280" font-family="Segoe UI,sans-serif">  Economico / Educativo</text>
+      <text x="613" y="230" font-size="10" fill="#6b7280" font-family="Segoe UI,sans-serif">  Laboral / Demografico</text>
+      <text x="613" y="244" font-size="10" fill="#e2e8f0" font-family="Segoe UI,sans-serif">unidad, descripcion</text>
+      <line x1="525" y1="200" x2="600" y2="200" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+      <!-- Leyenda -->
+      <text x="10" y="390" font-size="9.5" fill="#374151" font-family="Segoe UI,sans-serif">PK = Clave Primaria  |  FK = Clave Foranea  |  - - - Relacion entre tablas  |  Motor: SQL Server 2022 / SQLEXPRESS</text>
+    </svg>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-section">
+  <div class="section-title">Estadisticas del modelo</div>
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="val" id="k-paises">–</div><div class="lbl">Paises</div></div>
+    <div class="kpi-card"><div class="val" id="k-anios">–</div><div class="lbl">Anos (1960–2024)</div></div>
+    <div class="kpi-card"><div class="val" id="k-ind">–</div><div class="lbl">Indicadores</div></div>
+    <div class="kpi-card"><div class="val" id="k-reg">–</div><div class="lbl">Regiones</div></div>
+    <div class="kpi-card"><div class="val">249,470</div><div class="lbl">Hechos en fact_indicadores</div></div>
+    <div class="kpi-card"><div class="val" id="k-modo">–</div><div class="lbl">Fuente de datos activa</div></div>
+  </div>
+</div>
+
+<!-- OLAP EXPLICACION -->
+<div class="olap-section" style="padding-bottom:0; border-bottom: 1px solid var(--border);">
+  <div class="section-title">Que es OLAP y como se aplica en este proyecto</div>
+  <p style="color:var(--muted);font-size:.82rem;line-height:1.7;max-width:860px;margin-bottom:1.1rem;">
+    OLAP (<em>Online Analytical Processing</em>) es una tecnica para analizar grandes volumenes de datos
+    desde multiples perspectivas al mismo tiempo. A diferencia de una consulta simple que filtra filas,
+    OLAP permite moverse entre niveles de detalle y cruzar dimensiones. El modelo estrella que se
+    implemento sobre SQL Server (fact_indicadores + 4 dimensiones, 249,470 hechos) es la estructura
+    que hace posibles estas operaciones de forma eficiente.
+  </p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.6rem;margin-bottom:1.25rem;">
+
+    <div style="background:#0b1120;border:1px solid var(--border);border-radius:7px;padding:.85rem 1rem;">
+      <div style="font-size:.72rem;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;">Roll-Up</div>
+      <p style="font-size:.78rem;color:#9ca3af;line-height:1.6;margin:0;">
+        Sube el nivel de detalle: agrega datos de pais a region, agrupados por decada.
+        Equivale a hacer zoom hacia afuera sobre los datos.
       </p>
-
-      <!-- Bullets de lo que vendrá -->
-      <div class="grid sm:grid-cols-2 gap-3 text-left mb-12 fade-up" style="animation-delay:.25s">
-                <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#7c3aed"></span>
-          <span class="text-sm text-slate-400">Análisis de componentes principales (PCA) sobre los indicadores ODS</span>
-        </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#7c3aed"></span>
-          <span class="text-sm text-slate-400">Clustering de países por perfil de desarrollo</span>
-        </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#7c3aed"></span>
-          <span class="text-sm text-slate-400">Correlaciones multivariables entre dimensiones económicas y sociales</span>
-        </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#7c3aed"></span>
-          <span class="text-sm text-slate-400">Visualización 3D de agrupaciones por región y nivel de ingreso</span>
-        </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#7c3aed"></span>
-          <span class="text-sm text-slate-400">Índice compuesto de desarrollo sostenible por país</span>
-        </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#7c3aed"></span>
-          <span class="text-sm text-slate-400">Mapas de calor multidimensionales interactivos</span>
-        </div>
-      </div>
-
-      <!-- Acciones -->
-      <div class="flex flex-wrap gap-3 justify-center fade-up" style="animation-delay:.3s">
-        <a href="/dashboard"
-           class="bg-ocean-600 hover:bg-ocean-500 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors">
-          Ir al Dashboard
-        </a>
-        <a href="/"
-           class="border border-slate-700 hover:border-slate-600 text-slate-400 hover:text-slate-200 font-medium px-6 py-3 rounded-xl text-sm transition-colors">
-          ← Volver al inicio
-        </a>
-      </div>
-
     </div>
-  </main>
 
+    <div style="background:#0b1120;border:1px solid var(--border);border-radius:7px;padding:.85rem 1rem;">
+      <div style="font-size:.72rem;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;">Drill-Down</div>
+      <p style="font-size:.78rem;color:#9ca3af;line-height:1.6;margin:0;">
+        Lo contrario del Roll-Up: parte de una region y muestra el valor de cada pais dentro de ella para un ano especifico. Zoom hacia adentro.
+      </p>
+    </div>
+
+    <div style="background:#0b1120;border:1px solid var(--border);border-radius:7px;padding:.85rem 1rem;">
+      <div style="font-size:.72rem;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;">Slice</div>
+      <p style="font-size:.78rem;color:#9ca3af;line-height:1.6;margin:0;">
+        Fija un indicador y una region, y recorre todos los anos. Como sacar una rebanada del cubo de datos manteniendo dos dimensiones fijas.
+      </p>
+    </div>
+
+    <div style="background:#0b1120;border:1px solid var(--border);border-radius:7px;padding:.85rem 1rem;">
+      <div style="font-size:.72rem;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;">Dice</div>
+      <p style="font-size:.78rem;color:#9ca3af;line-height:1.6;margin:0;">
+        Filtra varias dimensiones a la vez: categoria de indicador y rango de anos. Produce un subcubo mas restringido que Slice.
+      </p>
+    </div>
+
+    <div style="background:#0b1120;border:1px solid var(--border);border-radius:7px;padding:.85rem 1rem;">
+      <div style="font-size:.72rem;font-weight:700;color:#06b6d4;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;">Ranking</div>
+      <p style="font-size:.78rem;color:#9ca3af;line-height:1.6;margin:0;">
+        Consulta analitica con funcion de ventana SQL <code style="color:#60a5fa;font-size:.72rem;">RANK() OVER</code>. Clasifica paises por un indicador en un ano dado sin subconsultas anidadas.
+      </p>
+    </div>
+
+    <div style="background:#0b1120;border:1px solid var(--border);border-radius:7px;padding:.85rem 1rem;">
+      <div style="font-size:.72rem;font-weight:700;color:#ec4899;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;">Tendencia</div>
+      <p style="font-size:.78rem;color:#9ca3af;line-height:1.6;margin:0;">
+        Calcula el promedio mundial y la desviacion estandar por decada. Si la desviacion es alta, habia mucha desigualdad entre paises en ese periodo.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<!-- OLAP CONSULTAS -->
+<div class="olap-section">
+  <div class="section-title">Consultas analiticas OLAP</div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('rollup',this)">Roll-Up</button>
+    <button class="tab-btn"        onclick="switchTab('drilldown',this)">Drill-Down</button>
+    <button class="tab-btn"        onclick="switchTab('slice',this)">Slice</button>
+    <button class="tab-btn"        onclick="switchTab('dice',this)">Dice</button>
+    <button class="tab-btn"        onclick="switchTab('ranking',this)">Ranking</button>
+    <button class="tab-btn"        onclick="switchTab('tendencia',this)">Tendencia</button>
+  </div>
+
+  <!-- ROLL-UP -->
+  <div class="tab-panel active" id="panel-rollup">
+    <div class="panel-title">Roll-Up — PIB per capita promedio por region y decada</div>
+    <div class="panel-subtitle">
+      Agrega valores del nivel pais hacia el nivel region, agrupados por decada.
+      <strong>Operacion:</strong> GROUP BY region, decada con AVG sobre la tabla de hechos.
+    </div>
+    <div class="sql-block"><span class="kw">SELECT</span> r.nombre_region, t.decada,
+       <span class="fn">ROUND</span>(<span class="fn">AVG</span>(f.valor), 2) <span class="kw">AS</span> pib_promedio,
+       <span class="fn">COUNT</span>(f.valor) <span class="kw">AS</span> n_obs
+<span class="kw">FROM</span> fact_indicadores f
+<span class="kw">JOIN</span> dim_tiempo t    <span class="kw">ON</span> f.id_tiempo    = t.id_tiempo
+<span class="kw">JOIN</span> dim_pais p      <span class="kw">ON</span> f.id_pais      = p.id_pais
+<span class="kw">JOIN</span> dim_region r    <span class="kw">ON</span> p.id_region    = r.id_region
+<span class="kw">JOIN</span> dim_indicador i <span class="kw">ON</span> f.id_indicador = i.id_indicador
+<span class="kw">WHERE</span> i.nombre = <span class="str">'PIB per capita'</span> <span class="kw">AND</span> f.valor <span class="kw">IS NOT NULL</span>
+<span class="kw">GROUP BY</span> r.nombre_region, t.decada
+<span class="kw">ORDER BY</span> r.nombre_region, t.decada</div>
+    <button class="btn-run" onclick="loadRollup()">Ejecutar consulta</button>
+    <br/><br/>
+    <div class="chart-wrap"><canvas id="chart-rollup"></canvas></div>
+    <div class="tbl-wrap" id="tbl-rollup"></div>
+  </div>
+
+  <!-- DRILL-DOWN -->
+  <div class="tab-panel" id="panel-drilldown">
+    <div class="panel-title">Drill-Down — Esperanza de vida: de region a pais</div>
+    <div class="panel-subtitle">
+      Desagrega un indicador desde el nivel region al nivel pais para un ano especifico.
+      <strong>Operacion:</strong> filtro fijo sobre dim_region y dim_tiempo, listado por pais.
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-group"><label>Region</label><select id="dd-region"></select></div>
+      <div class="ctrl-group"><label>Ano</label><select id="dd-year"></select></div>
+      <button class="btn-run" onclick="loadDrilldown()">Ejecutar</button>
+    </div>
+    <div class="chart-wrap"><canvas id="chart-drilldown"></canvas></div>
+    <div class="tbl-wrap" id="tbl-drilldown"></div>
+  </div>
+
+  <!-- SLICE -->
+  <div class="tab-panel" id="panel-slice">
+    <div class="panel-title">Slice — Evolucion de un indicador en una region a lo largo del tiempo</div>
+    <div class="panel-subtitle">
+      Fija dos dimensiones (indicador y region) y recorre toda la dimension tiempo.
+      <strong>Operacion:</strong> WHERE fijo sobre indicador y region, GROUP BY ano.
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-group"><label>Indicador</label><select id="sl-ind"></select></div>
+      <div class="ctrl-group"><label>Region</label><select id="sl-region"></select></div>
+      <button class="btn-run" onclick="loadSlice()">Ejecutar</button>
+    </div>
+    <div class="chart-wrap"><canvas id="chart-slice"></canvas></div>
+    <div class="tbl-wrap" id="tbl-slice"></div>
+  </div>
+
+  <!-- DICE -->
+  <div class="tab-panel" id="panel-dice">
+    <div class="panel-title">Dice — Subconjunto multidimensional por categoria y rango de anos</div>
+    <div class="panel-subtitle">
+      Filtra simultaneamente en las dimensiones tiempo, indicador y region.
+      <strong>Operacion:</strong> BETWEEN en dim_tiempo + filtro de categoria en dim_indicador.
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-group"><label>Categoria</label>
+        <select id="dc-cat">
+          <option>Economico</option>
+          <option>Educativo</option>
+          <option>Laboral</option>
+          <option>Demografico</option>
+          <option>Social</option>
+        </select>
+      </div>
+      <div class="ctrl-group"><label>Ano desde</label><input type="number" id="dc-from" value="2000" min="1960" max="2024"/></div>
+      <div class="ctrl-group"><label>Ano hasta</label><input type="number" id="dc-to"   value="2020" min="1960" max="2024"/></div>
+      <button class="btn-run" onclick="loadDice()">Ejecutar</button>
+    </div>
+    <div class="tbl-wrap" id="tbl-dice"></div>
+  </div>
+
+  <!-- RANKING -->
+  <div class="tab-panel" id="panel-ranking">
+    <div class="panel-title">Ranking — Clasificacion de paises con RANK() OVER</div>
+    <div class="panel-subtitle">
+      Clasifica paises usando funciones de ventana SQL para un indicador y ano dados.
+      <strong>Operacion:</strong> RANK() OVER (ORDER BY f.valor DESC) con TOP N.
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-group"><label>Indicador</label><select id="rk-ind"></select></div>
+      <div class="ctrl-group"><label>Ano</label><select id="rk-year"></select></div>
+      <div class="ctrl-group"><label>Top N</label>
+        <select id="rk-top">
+          <option value="10">Top 10</option>
+          <option value="15" selected>Top 15</option>
+          <option value="20">Top 20</option>
+        </select>
+      </div>
+      <button class="btn-run" onclick="loadRanking()">Ejecutar</button>
+    </div>
+    <div class="chart-wrap"><canvas id="chart-ranking"></canvas></div>
+    <div class="tbl-wrap" id="tbl-ranking"></div>
+  </div>
+
+  <!-- TENDENCIA -->
+  <div class="tab-panel" id="panel-tendencia">
+    <div class="panel-title">Tendencia — Evolucion mundial por decada con desviacion estandar</div>
+    <div class="panel-subtitle">
+      Muestra el promedio global y la dispersion de un indicador agrupado por decadas.
+      <strong>Operacion:</strong> AVG + STDEV agrupado por dim_tiempo.decada a nivel mundial.
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-group"><label>Indicador</label><select id="td-ind"></select></div>
+      <button class="btn-run" onclick="loadTendencia()">Ejecutar</button>
+    </div>
+    <div class="chart-wrap"><canvas id="chart-tendencia"></canvas></div>
+    <div class="tbl-wrap" id="tbl-tendencia"></div>
+  </div>
+
+  </div><!-- /olap-section consultas -->
+</div><!-- /olap-section explicacion wrapper -->
+
+<script>
+// ── Paleta ────────────────────────────────────────────────────
+const PAL = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#06b6d4',
+             '#ef4444','#ec4899','#84cc16','#f97316','#6366f1'];
+const BASE_OPTS = {
+  responsive: true,
+  plugins: {
+    legend: { labels: { color: '#9ca3af', font: { size: 10 } } }
+  },
+  scales: {
+    x: { ticks: { color: '#6b7280', font: { size: 10 } }, grid: { color: '#111827' } },
+    y: { ticks: { color: '#6b7280', font: { size: 10 } }, grid: { color: '#111827' } }
+  }
+};
+
+let charts = {};
+let META   = { regiones: [], indicadores: [], anios: [] };
+
+// ── Tabs ──────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── Chart helper ─────────────────────────────────────────────
+function resetChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+// ── Table helper ──────────────────────────────────────────────
+function buildTable(wrapId, rows, cols) {
+  if (!rows || !rows.length) {
+    document.getElementById(wrapId).innerHTML = '<p class="empty-msg">Sin resultados para los parametros seleccionados.</p>';
+    return;
+  }
+  let h = '<table class="olap-tbl"><thead><tr>';
+  cols.forEach(c => h += `<th>${c.label}</th>`);
+  h += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    h += '<tr>';
+    cols.forEach(c => {
+      const v   = r[c.key] ?? '–';
+      const cls = c.cls ? ` class="${c.cls}"` : '';
+      h += `<td${cls}>${typeof v === 'number' ? v.toLocaleString('es-CO') : v}</td>`;
+    });
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+  document.getElementById(wrapId).innerHTML = h;
+}
+
+function spinner(wrapId) {
+  document.getElementById(wrapId).innerHTML =
+    '<div class="spinner-wrap"><div class="spinner"></div></div>';
+}
+
+// ── META + KPIs ───────────────────────────────────────────────
+async function loadMeta() {
+  try {
+    const res = await fetch('/api/olap/meta');
+    const d   = await res.json();
+    if (!d.success) throw new Error();
+
+    META = d;
+
+    // Badge
+    const badge = document.getElementById('db-badge');
+    badge.className = 'db-badge db-ok';
+    badge.textContent = 'SQL Server activo';
+    document.getElementById('k-modo').textContent = 'SQL Server';
+
+    // KPIs
+    document.getElementById('k-paises').textContent = d.anios ? '202' : '–';
+    document.getElementById('k-anios').textContent  = d.anios ? d.anios.length : '–';
+    document.getElementById('k-ind').textContent    = d.indicadores ? d.indicadores.length : '–';
+    document.getElementById('k-reg').textContent    = d.regiones ? d.regiones.length : '–';
+
+    // Poblar selectores
+    fill('dd-region',  d.regiones);
+    fill('sl-region',  d.regiones);
+    fill('dd-year',    [...d.anios].filter(a => a >= 1990).reverse());
+    fill('sl-ind',     d.indicadores.map(i => i.nombre));
+    fill('rk-ind',     d.indicadores.map(i => i.nombre));
+    fill('rk-year',    [...d.anios].filter(a => a >= 2000).reverse());
+    fill('td-ind',     d.indicadores.map(i => i.nombre));
+
+    setVal('dd-year',  '2020');
+    setVal('sl-ind',   'Tasa de desempleo');
+    setVal('rk-ind',   'PIB per cápita');
+    setVal('rk-year',  '2020');
+    setVal('td-ind',   'Esperanza de vida');
+
+    loadRollup();
+
+  } catch(e) {
+    const badge = document.getElementById('db-badge');
+    badge.className = 'db-badge db-err';
+    badge.textContent = 'Modo pandas (Render)';
+    document.getElementById('k-modo').textContent = 'CSV / Pandas';
+
+    document.querySelectorAll('.tab-panel').forEach(p => {
+      p.insertAdjacentHTML('afterbegin',
+        '<div style="background:#1c0a0a;border:1px solid #7f1d1d;border-radius:6px;padding:.6rem 1rem;font-size:.78rem;color:#fca5a5;margin-bottom:.75rem;">' +
+        'Conexion a SQL Server no disponible. Las consultas se ejecutan sobre el CSV mediante pandas (modo Render).' +
+        '</div>');
+    });
+  }
+}
+
+function fill(id, items) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = items.map(v => `<option value="${v}">${v}</option>`).join('');
+}
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const opt = [...el.options].find(o => o.value == val);
+  if (opt) el.value = val;
+}
+
+// ── ROLL-UP ───────────────────────────────────────────────────
+async function loadRollup() {
+  resetChart('rollup');
+  spinner('tbl-rollup');
+  const d = await (await fetch('/api/olap/rollup')).json();
+
+  const decadas  = [...new Set(d.data.map(r => r.decada))].sort();
+  const regiones = [...new Set(d.data.map(r => r.region))];
+
+  const datasets = regiones.map((reg, i) => ({
+    label: reg,
+    data: decadas.map(dec => {
+      const f = d.data.find(r => r.region === reg && r.decada === dec);
+      return f ? f.pib_promedio : null;
+    }),
+    borderColor: PAL[i % PAL.length],
+    backgroundColor: PAL[i % PAL.length] + '18',
+    tension: .3, fill: false, spanGaps: true
+  }));
+
+  const ctx = document.getElementById('chart-rollup').getContext('2d');
+  charts['rollup'] = new Chart(ctx, {
+    type: 'line',
+    data: { labels: decadas, datasets },
+    options: { ...BASE_OPTS, plugins: { ...BASE_OPTS.plugins,
+      title: { display: true, text: 'PIB per capita promedio por region y decada', color: '#9ca3af', font: { size: 12 } }
+    }}
+  });
+
+  buildTable('tbl-rollup', d.data, [
+    { key: 'region',       label: 'Region' },
+    { key: 'decada',       label: 'Decada' },
+    { key: 'pib_promedio', label: 'PIB per capita prom. (USD)', cls: 'num' },
+    { key: 'n_obs',        label: 'Observaciones',             cls: 'num' }
+  ]);
+}
+
+// ── DRILL-DOWN ────────────────────────────────────────────────
+async function loadDrilldown() {
+  resetChart('drilldown');
+  spinner('tbl-drilldown');
+  const region = document.getElementById('dd-region').value;
+  const year   = document.getElementById('dd-year').value;
+  const d = await (await fetch(`/api/olap/drilldown?region=${encodeURIComponent(region)}&year=${year}`)).json();
+  const rows = d.data.slice(0, 20);
+
+  const ctx = document.getElementById('chart-drilldown').getContext('2d');
+  charts['drilldown'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: rows.map(r => r.pais),
+      datasets: [{ label: `Esperanza de vida (${year})`,
+        data: rows.map(r => r.esperanza_vida),
+        backgroundColor: rows.map((_, i) => PAL[i % PAL.length] + 'bb'),
+        borderColor:     rows.map((_, i) => PAL[i % PAL.length]),
+        borderWidth: 1
+      }]
+    },
+    options: { ...BASE_OPTS, indexAxis: 'y',
+      plugins: { ...BASE_OPTS.plugins,
+        title: { display: true, text: `Esperanza de vida — ${region} (${year})`, color: '#9ca3af', font: { size: 11 } }
+      }
+    }
+  });
+
+  buildTable('tbl-drilldown', d.data, [
+    { key: 'pais',           label: 'Pais' },
+    { key: 'region',         label: 'Region' },
+    { key: 'anio',           label: 'Ano',                      cls: 'num' },
+    { key: 'esperanza_vida', label: 'Esperanza de vida (anos)', cls: 'num' }
+  ]);
+}
+
+// ── SLICE ─────────────────────────────────────────────────────
+async function loadSlice() {
+  resetChart('slice');
+  spinner('tbl-slice');
+  const ind    = document.getElementById('sl-ind').value;
+  const region = document.getElementById('sl-region').value;
+  const d = await (await fetch(`/api/olap/slice?indicador=${encodeURIComponent(ind)}&region=${encodeURIComponent(region)}`)).json();
+
+  const ctx = document.getElementById('chart-slice').getContext('2d');
+  charts['slice'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: d.data.map(r => r.anio),
+      datasets: [{ label: ind,
+        data: d.data.map(r => r.valor_promedio),
+        borderColor: '#3b82f6', backgroundColor: '#3b82f615', tension: .3, fill: true
+      }]
+    },
+    options: { ...BASE_OPTS, plugins: { ...BASE_OPTS.plugins,
+      title: { display: true, text: `${ind} — ${region}`, color: '#9ca3af', font: { size: 11 } }
+    }}
+  });
+
+  buildTable('tbl-slice', d.data, [
+    { key: 'anio',           label: 'Ano',          cls: 'num' },
+    { key: 'valor_promedio', label: 'Valor promedio', cls: 'num' }
+  ]);
+}
+
+// ── DICE ──────────────────────────────────────────────────────
+async function loadDice() {
+  spinner('tbl-dice');
+  const cat  = document.getElementById('dc-cat').value;
+  const from = document.getElementById('dc-from').value;
+  const to   = document.getElementById('dc-to').value;
+  const d = await (await fetch(`/api/olap/dice?categoria=${encodeURIComponent(cat)}&year_from=${from}&year_to=${to}`)).json();
+
+  buildTable('tbl-dice', d.data, [
+    { key: 'region',         label: 'Region' },
+    { key: 'indicador',      label: 'Indicador' },
+    { key: 'categoria',      label: 'Categoria' },
+    { key: 'decada',         label: 'Decada' },
+    { key: 'valor_promedio', label: 'Promedio', cls: 'num' }
+  ]);
+}
+
+// ── RANKING ───────────────────────────────────────────────────
+async function loadRanking() {
+  resetChart('ranking');
+  spinner('tbl-ranking');
+  const ind  = document.getElementById('rk-ind').value;
+  const year = document.getElementById('rk-year').value;
+  const top  = document.getElementById('rk-top').value;
+  const d = await (await fetch(`/api/olap/ranking?indicador=${encodeURIComponent(ind)}&year=${year}&top=${top}`)).json();
+
+  const ctx = document.getElementById('chart-ranking').getContext('2d');
+  charts['ranking'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: d.data.map(r => r.pais),
+      datasets: [{ label: ind,
+        data: d.data.map(r => r.valor),
+        backgroundColor: d.data.map((_, i) => PAL[i % PAL.length] + 'bb'),
+        borderColor:     d.data.map((_, i) => PAL[i % PAL.length]),
+        borderWidth: 1
+      }]
+    },
+    options: { ...BASE_OPTS, indexAxis: 'y',
+      plugins: { ...BASE_OPTS.plugins,
+        title: { display: true, text: `Top ${top}: ${ind} (${year})`, color: '#9ca3af', font: { size: 11 } }
+      }
+    }
+  });
+
+  buildTable('tbl-ranking', d.data, [
+    { key: 'ranking', label: '#',      cls: 'rank-num' },
+    { key: 'pais',    label: 'Pais' },
+    { key: 'region',  label: 'Region' },
+    { key: 'valor',   label: 'Valor',  cls: 'num' },
+    { key: 'anio',    label: 'Ano',    cls: 'num' }
+  ]);
+}
+
+// ── TENDENCIA ─────────────────────────────────────────────────
+async function loadTendencia() {
+  resetChart('tendencia');
+  spinner('tbl-tendencia');
+  const ind = document.getElementById('td-ind').value;
+  const d = await (await fetch(`/api/olap/tendencia?indicador=${encodeURIComponent(ind)}`)).json();
+
+  const ctx = document.getElementById('chart-tendencia').getContext('2d');
+  charts['tendencia'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: d.data.map(r => r.decada),
+      datasets: [
+        { type: 'line', label: 'Promedio global', data: d.data.map(r => r.promedio),
+          borderColor: '#3b82f6', backgroundColor: '#3b82f615', tension: .3, yAxisID: 'y' },
+        { label: 'Desviacion estandar', data: d.data.map(r => r.desviacion_std),
+          backgroundColor: '#f59e0b55', borderColor: '#f59e0b', borderWidth: 1, yAxisID: 'y' }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#9ca3af', font: { size: 10 } } },
+        title: { display: true, text: `Tendencia mundial — ${ind}`, color: '#9ca3af', font: { size: 11 } }
+      },
+      scales: {
+        x: { ticks: { color: '#6b7280' }, grid: { color: '#111827' } },
+        y: { ticks: { color: '#6b7280' }, grid: { color: '#111827' } }
+      }
+    }
+  });
+
+  buildTable('tbl-tendencia', d.data, [
+    { key: 'decada',         label: 'Decada' },
+    { key: 'promedio',       label: 'Promedio global',    cls: 'num' },
+    { key: 'desviacion_std', label: 'Desv. estandar',     cls: 'num' },
+    { key: 'n_obs',          label: 'N observaciones',    cls: 'num' }
+  ]);
+}
+
+// ── Init ──────────────────────────────────────────────────────
+loadMeta();
+</script>
 </body>
 </html>
