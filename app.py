@@ -6,19 +6,26 @@ Metodología SEMMA: Selección, Exploración, Modelado, Visualización, Evaluaci
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import json
+import os
 from datetime import datetime
 
 app = Flask(__name__)
 
 # ==================== FASE 1: SELECCIÓN Y CARGA DE DATOS ====================
 
+# Ruta absoluta al CSV — funciona tanto en local como en Render/Gunicorn
+BASE_DIR  = os.path.dirname(os.path.abspath(__file__))
+CSV_PATH  = os.path.join(BASE_DIR, 'data', 'ods_data.csv')
+
 try:
-    df = pd.read_csv('data/ods_data.csv')
+    df = pd.read_csv(CSV_PATH)
     df.columns = df.columns.str.strip()
     print(f"✓ Dataset cargado: {df.shape[0]} registros, {df.shape[1]} columnas")
+    print(f"✓ Ruta CSV: {CSV_PATH}")
     print(f"Columnas disponibles: {list(df.columns)}")
 except Exception as e:
-    print(f"Error al cargar datos: {e}")
+    print(f"✗ Error al cargar datos: {e}")
+    print(f"  Ruta intentada: {CSV_PATH}")
     df = None
 
 # ==================== CONFIGURACIÓN DE COLUMNAS ====================
