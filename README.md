@@ -4,32 +4,7 @@ Plataforma web multi-página para explorar, filtrar, comparar y visualizar los i
 
 ---
 
-## 🚀 Inicio rápido
-
-```bash
-# 1. Clonar
-git clone https://github.com/ZIMABLUE339/Mineria_datoss-main.git
-cd Mineria_datoss-main
-
-# 2. Ambiente virtual
-python -m venv .venv
-.venv\Scripts\activate        # Windows
-source .venv/bin/activate     # macOS/Linux
-
-# 3. Dependencias
-pip install -r requirements.txt
-
-# 4. Ejecutar
-python app.py
-```
-
-Abrir en el navegador:
-- **Home:** http://localhost:5000/
-- **Dashboard:** http://localhost:5000/dashboard
-
----
-
-## 📁 Estructura del proyecto
+## Estructura del proyecto
 
 ```
 proyecto-ods/
@@ -50,7 +25,7 @@ proyecto-ods/
 
 ---
 
-## 📊 Dataset
+## Dataset
 
 | Campo | Detalle |
 |-------|---------|
@@ -63,7 +38,7 @@ proyecto-ods/
 
 ---
 
-## 🧭 Páginas y módulos
+## Páginas y módulos
 
 | Ruta | Módulo | Estado |
 |------|--------|--------|
@@ -75,7 +50,7 @@ proyecto-ods/
 
 ---
 
-## 🔌 API REST
+## API REST
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
@@ -98,7 +73,7 @@ POST /api/compare
 
 ---
 
-## ✨ Características del dashboard
+## Características del dashboard
 
 - **Filtros requeridos** — País e Indicador obligatorios; validación visual con borde rojo
 - **Filtro por nivel de ingreso** — Banco Mundial (Alto / Medio-alto / Medio-bajo / Bajo)
@@ -110,7 +85,7 @@ POST /api/compare
 
 ---
 
-## 🏗️ Stack tecnológico
+## Stack tecnológico
 
 **Backend:** Python 3.10+ · Flask · Pandas · Gunicorn
 
@@ -120,7 +95,7 @@ POST /api/compare
 
 ---
 
-## 🚀 Despliegue en Render
+## Despliegue en Render
 
 1. Push a `main` en GitHub
 2. Render ejecuta automáticamente:
@@ -130,7 +105,7 @@ POST /api/compare
 
 ---
 
-## 📖 Metodología SEMMA
+## Metodología SEMMA
 
 | Fase | Implementación |
 |------|---------------|
@@ -142,7 +117,7 @@ POST /api/compare
 
 ---
 
-## 📝 Changelog
+## Changelog
 
 ### v2.0.0 — 2026-05-16
 - Navegación global con 5 módulos en todas las páginas
@@ -158,11 +133,3 @@ POST /api/compare
 - Filtros por país, indicador y año
 - Comparación de países
 - Despliegue en Render
-
----
-
-## 📚 Documentación completa
-
-Ver [`DOCUMENTACION_TECNICA.md`](./DOCUMENTACION_TECNICA.md) para arquitectura detallada, explicación de funciones, guía de desarrollo y troubleshooting.
-
-**Dataset:** https://docs.google.com/spreadsheets/d/1wkkgqcA-ruldAVnp5_FOUymfi1yiOH8r/
