@@ -790,6 +790,42 @@ def server_error(error):
     except: return "500 - Error del servidor", 500
 
 
+
+# ==================== NIVEL 3 — MINERÍA DE DATOS (ORANGE) ====================
+ 
+@app.route('/api/mineria/clusters', methods=['GET'])
+def get_clusters():
+    """Devuelve los datos clusterizados exportados desde Orange Data Mining"""
+    try:
+        # Ruta al archivo exportado desde Orange
+        cluster_path = os.path.join(BASE_DIR, 'data', 'ods_clusters.csv')
+       
+        if not os.path.exists(cluster_path):
+            return jsonify({'success': False, 'error': 'Archivo ods_clusters.csv no encontrado en la carpeta data/'}), 404
+ 
+        # Leer el CSV generado por Orange
+        df_clusters = pd.read_csv(cluster_path, encoding='utf-8-sig')
+ 
+        # Variables exactas que usamos en la gráfica de Orange
+        col_pais = 'País'
+        col_x = 'Población Total'
+        col_y = 'Tasa de crecimiento del PIB'
+        col_cluster = 'Cluster'
+ 
+        # Limpiamos nombres de columnas por si Orange agregó espacios
+        df_clusters.columns = df_clusters.columns.str.strip()
+ 
+        # Extraemos solo las columnas necesarias y eliminamos nulos
+        df_plot = df_clusters[[col_pais, col_x, col_y, col_cluster]].dropna()
+        # Convertimos a formato diccionario para JSON
+        data = df_plot.to_dict(orient='records')
+       
+        return jsonify({'success': True, 'data': data})
+ 
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # ==================== PUNTO DE ENTRADA ====================
 
 if __name__ == '__main__':

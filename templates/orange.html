@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Orange — Minería Visual — ODS Explorer</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap%22 rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; background: #0b1120; color: #e2e8f0; }
     .mono { font-family: 'JetBrains Mono', monospace; }
     .nav-link { color: #64748b; text-decoration: none; }
     .nav-link:hover { color: #e2e8f0; background: rgba(255,255,255,0.05); }
-    .nav-link.active-page { color: #fb923c; background: rgba(20,128,235,0.12); }
+    .nav-link.active-page { color: #ea580c; background: rgba(234, 88, 12, 0.12); }
     .scrollbar-hide { scrollbar-width: none; }
     .scrollbar-hide::-webkit-scrollbar { display: none; }
     .bg-grid {
@@ -21,119 +22,295 @@
         linear-gradient(90deg, rgba(59,158,248,0.04) 1px, transparent 1px);
       background-size: 40px 40px;
     }
-    @keyframes pulse-slow { 0%,100%{opacity:1} 50%{opacity:.5} }
-    .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
     .fade-up { animation: fadeUp 0.6s ease both; }
+   
+    /* Estilos para el texto del informe */
+    .prose-report p { margin-bottom: 1rem; line-height: 1.6; color: #cbd5e1; }
+    .prose-report h3 { font-size: 1.25rem; font-weight: 600; color: #f8fafc; margin-top: 2rem; margin-bottom: 1rem; }
+    .prose-report ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.5rem; color: #cbd5e1; }
+    .prose-report li { margin-bottom: 0.5rem; }
   </style>
 </head>
-<body class="min-h-screen">
-
-  <!-- ═══ NAV GLOBAL ═══ -->
+<body class="min-h-screen bg-grid">
+ 
   <header class="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/60">
     <div class="h-14 flex items-center px-6 gap-0 max-w-full">
       <a href="/" class="flex items-center gap-2 group shrink-0 mr-6">
-        <div class="w-7 h-7 rounded-lg bg-ocean-600 flex items-center justify-center">
-          <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path d="M3 12a9 9 0 1018 0 9 9 0 00-18 0"/>
-          </svg>
+        <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
+          <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1018 0 9 9 0 00-18 0"/></svg>
         </div>
-        <span class="mono text-xs font-semibold tracking-widest text-ocean-300 uppercase hidden sm:block">ODS Explorer</span>
+        <span class="mono text-xs font-semibold tracking-widest text-blue-300 uppercase hidden sm:block">ODS Explorer</span>
       </a>
       <div class="h-5 w-px bg-slate-800 mr-6 shrink-0"></div>
       <nav class="flex items-center gap-1 flex-1 overflow-x-auto scrollbar-hide">
         <a href="/" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
-          Inicio
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg> Inicio
         </a>
         <a href="/dashboard" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
-          Dashboard
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg> Dashboard
         </a>
         <a href="/multidimensional" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
-          Modelo Multidimensional
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg> Modelo Multidimensional
         </a>
         <a href="/orange" class="nav-link active-page flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21a48.25 48.25 0 01-8.135-.687c-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg>
-          Orange
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21a48.25 48.25 0 01-8.135-.687c-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg> Orange
         </a>
-        <a href="/spark" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
+         <a href="/spark" class="nav-link flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
           Spark
         </a>
+
       </nav>
     </div>
   </header>
-  <!-- ═══ /NAV GLOBAL ═══ -->
-
-  <!-- CONTENIDO -->
-  <main class="pt-14 min-h-screen bg-grid flex items-center justify-center px-6">
-    <div class="max-w-2xl w-full text-center py-24">
-
-      <!-- Icono / badge -->
-      <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 fade-up"
-           style="background: #ea580c20; border: 1px solid #ea580c30;">
-        <span class="text-4xl">🍊</span>
+  <main class="pt-24 pb-12 px-6 max-w-7xl mx-auto relative">
+   
+    <div class="mb-10 fade-up">
+      <div class="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-4" style="background:#ea580c15; border:1px solid #ea580c25;">
+        <span class="text-xl">🍊</span>
+        <span class="mono text-xs uppercase tracking-widest" style="color:#ea580c">Nivel 3: Conocimiento Oculto</span>
       </div>
-
-      <!-- Badge "próximamente" -->
-      <div class="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6 fade-up"
-           style="background:#ea580c15; border:1px solid #ea580c25; animation-delay:.1s">
-        <span class="w-2 h-2 rounded-full animate-pulse-slow" style="background:#ea580c"></span>
-        <span class="mono text-xs uppercase tracking-widest" style="color:#ea580c">En construcción · Próximamente</span>
-      </div>
-
-      <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight fade-up" style="animation-delay:.15s">
-        Orange — Minería Visual
-      </h1>
-
-      <p class="text-slate-400 text-lg leading-relaxed mb-10 fade-up" style="animation-delay:.2s">
-        Integración con Orange Data Mining para flujos visuales de análisis. Carga los datasets ODS directamente y ejecuta flujos de clasificación, regresión y clustering sin código.
-      </p>
-
-      <!-- Bullets de lo que vendrá -->
-      <div class="grid sm:grid-cols-2 gap-3 text-left mb-12 fade-up" style="animation-delay:.25s">
-                <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#ea580c"></span>
-          <span class="text-sm text-slate-400">Flujos de trabajo visuales de clasificación y regresión</span>
-        </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#ea580c"></span>
-          <span class="text-sm text-slate-400">Árbol de decisión sobre indicadores ODS por región</span>
-        </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#ea580c"></span>
-          <span class="text-sm text-slate-400">Análisis de texto sobre reportes de desarrollo</span>
-        </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#ea580c"></span>
-          <span class="text-sm text-slate-400">Exportación de modelos entrenados en Orange hacia Flask</span>
-        </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#ea580c"></span>
-          <span class="text-sm text-slate-400">Comparación de algoritmos: Naive Bayes, SVM, Random Forest</span>
-        </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#ea580c"></span>
-          <span class="text-sm text-slate-400">Integración bidireccional con el dataset ods_data.csv</span>
-        </div>
-      </div>
-
-      <!-- Acciones -->
-      <div class="flex flex-wrap gap-3 justify-center fade-up" style="animation-delay:.3s">
-        <a href="/dashboard"
-           class="bg-ocean-600 hover:bg-ocean-500 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors">
-          Ir al Dashboard
-        </a>
-        <a href="/"
-           class="border border-slate-700 hover:border-slate-600 text-slate-400 hover:text-slate-200 font-medium px-6 py-3 rounded-xl text-sm transition-colors">
-          ← Volver al inicio
-        </a>
-      </div>
-
+      <h1 class="text-3xl md:text-4xl font-bold mb-3 text-white">Minería de Datos Interactiva</h1>
+      <p class="text-slate-400 text-lg">Descubrimientos exportados y renderizados en tiempo real mediante integraciones API con Flask.</p>
     </div>
+ 
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-16">
+     
+      <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 col-span-1 lg:col-span-2 fade-up" style="animation-delay: 0.1s;">
+        <div class="flex flex-col lg:flex-row gap-6">
+            <div class="lg:w-1/3">
+                <h2 class="text-xl font-bold text-blue-400 mb-2">1. Agrupamiento Automático</h2>
+                <div class="text-sm text-slate-300 space-y-3">
+                    <p>La gráfica interactiva revela una separación casi vertical obtenida del K-Means. El algoritmo aisló un macro-clúster compuesto por naciones con un alto <b>bono demográfico</b>.</p>
+                    <p>Esto demuestra matemáticamente que la capacidad productiva poblacional (y no puramente monetaria) es el diferenciador estructural más fuerte de la economía global.</p>
+                </div>
+            </div>
+            <div class="lg:w-2/3 relative rounded-lg border border-slate-800 bg-slate-950/50 p-2" style="height: 400px;">
+                <div id="chartLoading" class="absolute inset-0 flex items-center justify-center text-slate-500 mono text-sm z-10">Cargando datos desde la API...</div>
+                <canvas id="clusterChart"></canvas>
+            </div>
+        </div>
+      </div>
+ 
+      <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 flex flex-col fade-up" style="animation-delay: 0.2s;">
+        <h2 class="text-xl font-bold text-teal-400 mb-2">2. Modelo Predictivo</h2>
+        <div class="text-sm text-slate-300 mb-4 space-y-2 flex-grow">
+            <p>Al modelar la pertenencia regional, el algoritmo posicionó la <b>Matriculación en escuelas terciarias</b> como el predictor raíz.</p>
+            <p>El acceso a la educación superior es el predictor más fuerte para determinar el desarrollo. El aumento del PIB es el efecto; la retención de capital humano es la causa.</p>
+        </div>
+        <div class="rounded-lg overflow-hidden border border-slate-800 bg-slate-950 flex items-center justify-center p-2 h-64 relative group cursor-pointer" onclick="openModal('{{ url_for('static', filename='tree-viwer-orange.png') }}')">
+          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+              <span class="bg-slate-800/80 text-white px-3 py-1.5 rounded-lg text-sm font-medium backdrop-blur-sm border border-slate-600 shadow-lg">Ampliar imagen</span>
+          </div>
+          <img src="{{ url_for('static', filename='tree-viwer-orange.png') }}" alt="Árbol de Decisión" class="max-w-full max-h-full object-contain opacity-90 transition-opacity" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'text-slate-500 text-xs mono\'>Imagen no encontrada</span>'">
+        </div>
+      </div>
+ 
+      <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 flex flex-col fade-up" style="animation-delay: 0.3s;">
+        <h2 class="text-xl font-bold text-purple-400 mb-2">3. Reglas de Asociación</h2>
+        <div class="text-sm text-slate-300 mb-4 space-y-2 flex-grow">
+            <p>El algoritmo extrajo una fuerte implicación lógica (Confianza > 40%) entre la <b>Población Total</b> y la <b>Tasa de crecimiento del PIB</b>.</p>
+            <p>Esto valida que el ritmo al que se acelera una economía está ligado a la escala de su población, actuando como un motor de arrastre para el crecimiento productivo.</p>
+        </div>
+        <div class="rounded-lg overflow-hidden border border-slate-800 bg-slate-950 flex items-center justify-center p-2 h-64 relative group cursor-pointer" onclick="openModal('{{ url_for('static', filename='assosiaton rules orange.png') }}')">
+          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+              <span class="bg-slate-800/80 text-white px-3 py-1.5 rounded-lg text-sm font-medium backdrop-blur-sm border border-slate-600 shadow-lg">Ampliar imagen</span>
+          </div>
+          <img src="{{ url_for('static', filename='assosiaton rules orange.png') }}" alt="Reglas de Asociación" class="max-w-full max-h-full object-contain opacity-90 transition-opacity" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'text-slate-500 text-xs mono\'>Imagen no encontrada</span>'">
+        </div>
+      </div>
+    </div>
+ 
+ 
+    <hr class="border-slate-800/80 my-12">
+   
+    <div class="fade-up" style="animation-delay: 0.4s;">
+        <h2 class="text-3xl font-bold text-white mb-8">Informe Técnico: Pipeline en Orange Data Mining</h2>
+       
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-8 prose-report">
+           
+            <h3 class="text-ocean-400 mt-0">1. Descripción del Flujo de Trabajo (KDD)</h3>
+            <p>
+                Para abordar el Nivel de Conocimiento Oculto (Nivel 3), se aplicó la metodología de Descubrimiento de Conocimiento en Bases de Datos (KDD) utilizando <b>Orange Data Mining</b>. El objetivo fue superar el análisis descriptivo y aplicar algoritmos de machine learning no supervisado y supervisado sobre los 19 indicadores continuos del Banco Mundial para extraer patrones, heurísticas y segmentaciones latentes.
+            </p>
+           
+            <div class="my-6 relative group cursor-pointer bg-slate-950 rounded-lg p-2 border border-slate-700" onclick="openModal('{{ url_for('static', filename='Orangedash.png') }}')">
+                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 rounded-lg"><span class="bg-slate-800/80 text-white px-3 py-1.5 rounded-lg text-sm font-medium backdrop-blur-sm border border-slate-600 shadow-lg">Ampliar Lienzo Completo</span></div>
+                <img src="{{ url_for('static', filename='Orangedash.png') }}" alt="Flujo de Orange" class="w-full h-auto rounded opacity-90 hover:opacity-100 transition-opacity">
+                <p class="text-center text-xs text-slate-500 mt-2 font-mono">Fig 1. Flujo de trabajo completo diseñado visualmente en Orange.</p>
+            </div>
+ 
+            <p>
+                El pre-procesamiento incluyó imputación de valores nulos mediante promedios, normalización estadística ($\mu=0, \sigma^2=1$) para evitar la maldición de la dimensionalidad, y discretización por frecuencias equitativas para alimentar los algoritmos probabilísticos.
+            </p>
+ 
+            <hr class="border-slate-800 my-8">
+ 
+            <h3 class="text-blue-400">2. Agrupamiento y Polarización (K-Means)</h3>
+            <p>
+                El algoritmo K-Means se configuró para determinar matemáticamente el número óptimo de agrupaciones usando la métrica de <i>Silhouette Score</i>, descubriendo la existencia de múltiples perfiles de desarrollo que superan la clásica división binaria (naciones desarrolladas vs en desarrollo).
+            </p>
+ 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+                <div class="relative group cursor-pointer bg-slate-950 rounded-lg p-2 border border-slate-700" onclick="openModal('{{ url_for('static', filename='Kmeans-Orange.png') }}')">
+                    <img src="{{ url_for('static', filename='Kmeans-Orange.png') }}" alt="Configuración K-Means" class="w-full h-48 object-contain rounded opacity-90 hover:opacity-100 transition-opacity">
+                    <p class="text-center text-xs text-slate-500 mt-2 font-mono">Fig 2. Configuración del Algoritmo K-Means.</p>
+                </div>
+                <div class="relative group cursor-pointer bg-slate-950 rounded-lg p-2 border border-slate-700" onclick="openModal('{{ url_for('static', filename='Scatter-plot-orange.png') }}')">
+                    <img src="{{ url_for('static', filename='Scatter-plot-orange.png') }}" alt="Scatter Plot K-Means" class="w-full h-48 object-cover rounded opacity-90 hover:opacity-100 transition-opacity" style="object-position: left top;">
+                    <p class="text-center text-xs text-slate-500 mt-2 font-mono">Fig 3. Proyección Informativa en Orange.</p>
+                </div>
+            </div>
+ 
+            <hr class="border-slate-800 my-8">
+ 
+            <h3 class="text-teal-400">3. Modelo de Clasificación (Árboles de Decisión)</h3>
+            <p>
+                Se entrenó un modelo supervisado para predecir a qué región sociodemográfica pertenece un país según sus indicadores. El modelo particionó recursivamente los datos basándose en ganancia de información. Se demostró probabilísticamente que la educación superior y el volumen de población activa son los determinantes estadísticos más rígidos.
+            </p>
+           
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+                <div class="relative group cursor-pointer bg-slate-950 rounded-lg p-2 border border-slate-700" onclick="openModal('{{ url_for('static', filename='tree-orange.png') }}')">
+                    <img src="{{ url_for('static', filename='tree-orange.png') }}" alt="Configuración Tree" class="w-full h-48 object-contain rounded opacity-90 hover:opacity-100 transition-opacity">
+                    <p class="text-center text-xs text-slate-500 mt-2 font-mono">Fig 4. Parámetros del Decision Tree.</p>
+                </div>
+                <div class="relative group cursor-pointer bg-slate-950 rounded-lg p-2 border border-slate-700" onclick="openModal('{{ url_for('static', filename='tree-viwer-orange.png') }}')">
+                    <img src="{{ url_for('static', filename='tree-viwer-orange.png') }}" alt="Tree Viewer" class="w-full h-48 object-contain rounded opacity-90 hover:opacity-100 transition-opacity">
+                    <p class="text-center text-xs text-slate-500 mt-2 font-mono">Fig 5. Topología predictiva extraída.</p>
+                </div>
+            </div>
+ 
+            <hr class="border-slate-800 my-8">
+ 
+            <h3 class="text-purple-400">4. Extracción de Heurísticas (Association Rules)</h3>
+            <p>
+                Se implementó el algoritmo probabilístico de <i>Frequent Itemsets</i>. Relajando los umbrales de soporte y confianza para adaptarse a la dispersión económica global, se identificaron relaciones causales directas del tipo "Si X, entonces Y". El hallazgo principal vinculó el factor poblacional con la tracción del Producto Interno Bruto.
+            </p>
+ 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+                <div class="relative group cursor-pointer bg-slate-950 rounded-lg p-2 border border-slate-700" onclick="openModal('{{ url_for('static', filename='frequent-itemset-orange.png') }}')">
+                    <img src="{{ url_for('static', filename='frequent-itemset-orange.png') }}" alt="Frequent Itemsets" class="w-full h-48 object-cover rounded opacity-90 hover:opacity-100 transition-opacity" style="object-position: left top;">
+                    <p class="text-center text-xs text-slate-500 mt-2 font-mono">Fig 6. Minería de Itemsets Frecuentes.</p>
+                </div>
+                <div class="relative group cursor-pointer bg-slate-950 rounded-lg p-2 border border-slate-700" onclick="openModal('{{ url_for('static', filename='assosiaton rules orange.png') }}')">
+                    <img src="{{ url_for('static', filename='assosiaton rules orange.png') }}" alt="Association Rules" class="w-full h-48 object-cover rounded opacity-90 hover:opacity-100 transition-opacity" style="object-position: left top;">
+                    <p class="text-center text-xs text-slate-500 mt-2 font-mono">Fig 7. Reglas de Asociación y Confianza.</p>
+                </div>
+            </div>
+ 
+            <h3 class="text-white">Conclusión del Descubrimiento</h3>
+            <p>
+                Las técnicas de minería de datos validaron rigurosamente las hipótesis generadas en los niveles 1 y 2. Se demostró matemáticamente que el desarrollo sostenible no responde exclusivamente a inyecciones de capital, sino a la interacción sistémica de un ecosistema interconectado donde <b>el capital humano (educación y demografía productiva)</b> funciona como el verdadero motor causal del crecimiento regional.
+            </p>
+        </div>
+    </div>
+ 
   </main>
-
+ 
+  <div id="imageModal" class="fixed inset-0 z-[100] hidden bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-10 transition-opacity cursor-zoom-out" onclick="closeModal()">
+      <button class="absolute top-6 right-6 text-slate-400 hover:text-white transition-colors" onclick="closeModal()">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+      <img id="modalImage" src="" alt="Vista ampliada" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl border border-slate-700 cursor-default object-contain" onclick="event.stopPropagation()">
+  </div>
+ 
+  <script>
+    // ----- LÓGICA DEL MODAL DE IMÁGENES -----
+    function openModal(imageSrc) {
+        document.getElementById('modalImage').src = imageSrc;
+        document.getElementById('imageModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+ 
+    function closeModal() {
+        document.getElementById('imageModal').classList.add('hidden');
+        document.getElementById('modalImage').src = '';
+        document.body.style.overflow = 'auto';
+    }
+ 
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape") closeModal();
+    });
+ 
+    // ----- LÓGICA DE CHART.JS -----
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/mineria/clusters')
+            .then(response => response.json())
+            .then(res => {
+                const loadingDiv = document.getElementById('chartLoading');
+                if (!res.success) {
+                    loadingDiv.innerHTML = `<span class="text-red-400">Error: ${res.error}</span>`;
+                    return;
+                }
+                loadingDiv.style.display = 'none';
+                const data = res.data;
+                const uniqueClusters = [...new Set(data.map(item => item.Cluster))].sort();
+               
+                const colors = ['rgba(59, 130, 246, 0.4)', 'rgba(16, 185, 129, 0.4)', 'rgba(239, 68, 68, 0.4)'];
+                const borderColors = ['rgba(59, 130, 246, 0.8)', 'rgba(16, 185, 129, 0.8)', 'rgba(239, 68, 68, 0.8)'];
+ 
+                const datasets = uniqueClusters.map((clusterName, index) => {
+                    const clusterData = data.filter(item => item.Cluster === clusterName).map(item => ({
+                        x: item['Población Total'],
+                        y: item['Tasa de crecimiento del PIB'],
+                        country: item['País']
+                    }));
+                    return {
+                        label: `Clúster ${clusterName}`,
+                        data: clusterData,
+                        backgroundColor: colors[index % colors.length],
+                        borderColor: borderColors[index % borderColors.length],
+                        borderWidth: 1,
+                        pointRadius: 4,
+                        pointHoverRadius: 7
+                    };
+                });
+ 
+                const ctx = document.getElementById('clusterChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'scatter',
+                    data: { datasets: datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                titleColor: '#fff',
+                                bodyColor: '#cbd5e1',
+                                titleFont: { family: 'Inter', size: 13 },
+                                bodyFont: { family: 'JetBrains Mono', size: 12 },
+                                padding: 12, cornerRadius: 8, borderColor: 'rgba(51, 65, 85, 0.8)', borderWidth: 1,
+                                callbacks: {
+                                    label: function(context) {
+                                        const raw = context.raw;
+                                        return `${raw.country}: Pob. Total: ${raw.x.toLocaleString()} | Crecimiento: ${raw.y.toFixed(2)}%`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Población Total', color: '#64748b', font: { family: 'Inter' } },
+                                grid: { color: 'rgba(30, 41, 59, 0.8)', drawBorder: false },
+                                ticks: { color: '#64748b', font: { family: 'JetBrains Mono' } }
+                            },
+                            y: {
+                                title: { display: true, text: 'Tasa de Crecimiento del PIB (%)', color: '#64748b', font: { family: 'Inter' } },
+                                grid: { color: 'rgba(30, 41, 59, 0.8)', drawBorder: false },
+                                ticks: { color: '#64748b', font: { family: 'JetBrains Mono' } }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                document.getElementById('chartLoading').innerHTML = `<span class="text-red-400">Error de conexión con Flask.</span>`;
+                console.error(error);
+            });
+    });
+  </script>
 </body>
 </html>
