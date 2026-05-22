@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Apache Spark — ODS Explorer</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -21,24 +22,44 @@
         linear-gradient(90deg, rgba(59,158,248,0.04) 1px, transparent 1px);
       background-size: 40px 40px;
     }
-    @keyframes pulse-slow { 0%,100%{opacity:1} 50%{opacity:.5} }
-    .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
     .fade-up { animation: fadeUp 0.6s ease both; }
+    .chart-wrap { background:#111827; border:1px solid #1e293b; border-radius:12px; padding:1.25rem; }
+    .spark-table { width:100%; border-collapse:collapse; font-family:'JetBrains Mono',monospace; font-size:.75rem; }
+    .spark-table th { background:#1e293b; color:#38bdf8; padding:.6rem 1rem; text-align:left; white-space:nowrap; }
+    .spark-table td { padding:.55rem 1rem; border-bottom:1px solid #1e293b; white-space:nowrap; color:#94a3b8; }
+    .spark-table tr:hover td { background:rgba(56,189,248,0.04); }
+    .ci { background:#111827; border:1px solid #1e293b; padding:.45rem .9rem;
+          font-family:'JetBrains Mono',monospace; font-size:.72rem;
+          display:flex; justify-content:space-between; align-items:center; border-radius:6px; }
+    .cb { font-size:.6rem; padding:.18rem .45rem; border-radius:4px; font-weight:700; }
+    .cb0 { background:rgba(56,189,248,.2); color:#38bdf8; }
+    .cb1 { background:rgba(129,140,248,.2); color:#818cf8; }
+    .cb2 { background:rgba(52,211,153,.2); color:#34d399; }
+    .cb3 { background:rgba(251,191,36,.2); color:#fbbf24; }
+    .know-table { width:100%; border-collapse:collapse; font-size:.82rem; }
+    .know-table th { padding:.8rem 1rem; text-align:left; border-bottom:2px solid #1e293b; font-weight:600; }
+    .know-table td { padding:.75rem 1rem; border-bottom:1px solid #1e293b; color:#94a3b8; vertical-align:top; line-height:1.6; }
+    .know-table tr:hover td { background:rgba(56,189,248,0.03); }
+    .know-table td:first-child { color:#e2e8f0; font-weight:500; }
+    .tc { background:#111827; border:1px solid #1e293b; padding:1.25rem; border-radius:12px; position:relative; overflow:hidden; }
+    .tc::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:3px 0 0 3px; }
+    .tc0::before { background:#f87171; }
+    .tc1::before { background:#fbbf24; }
+    .tc2::before { background:#34d399; }
   </style>
 </head>
 <body class="min-h-screen">
-
-  <!-- ═══ NAV GLOBAL ═══ -->
+ 
   <header class="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/60">
     <div class="h-14 flex items-center px-6 gap-0 max-w-full">
       <a href="/" class="flex items-center gap-2 group shrink-0 mr-6">
-        <div class="w-7 h-7 rounded-lg bg-ocean-600 flex items-center justify-center">
+        <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
           <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path d="M3 12a9 9 0 1018 0 9 9 0 00-18 0"/>
           </svg>
         </div>
-        <span class="mono text-xs font-semibold tracking-widest text-ocean-300 uppercase hidden sm:block">ODS Explorer</span>
+        <span class="mono text-xs font-semibold tracking-widest text-blue-300 uppercase hidden sm:block">ODS Explorer</span>
       </a>
       <div class="h-5 w-px bg-slate-800 mr-6 shrink-0"></div>
       <nav class="flex items-center gap-1 flex-1 overflow-x-auto scrollbar-hide">
@@ -65,75 +86,451 @@
       </nav>
     </div>
   </header>
-  <!-- ═══ /NAV GLOBAL ═══ -->
-
-  <!-- CONTENIDO -->
-  <main class="pt-14 min-h-screen bg-grid flex items-center justify-center px-6">
-    <div class="max-w-2xl w-full text-center py-24">
-
-      <!-- Icono / badge -->
-      <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 fade-up"
-           style="background: #f59e0b20; border: 1px solid #f59e0b30;">
-        <span class="text-4xl">⚡</span>
+ 
+  <main class="pt-14 min-h-screen bg-grid">
+    <div class="max-w-7xl mx-auto px-6 py-10">
+ 
+      <div class="mb-10 fade-up">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="text-3xl">&#9889;</span>
+          <h1 class="text-3xl font-bold">Apache Spark</h1>
+          <span class="mono text-xs px-2 py-1 rounded-full" style="background:#f59e0b18;color:#f59e0b;border:1px solid #f59e0b25">4.1.1</span>
+        </div>
+        <p class="text-slate-400 text-sm">Procesamiento distribuido &middot; Dataset ODS Banco Mundial &middot; MLlib KMeans &middot; Universidad de Cundinamarca</p>
       </div>
-
-      <!-- Badge "próximamente" -->
-      <div class="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6 fade-up"
-           style="background:#f59e0b15; border:1px solid #f59e0b25; animation-delay:.1s">
-        <span class="w-2 h-2 rounded-full animate-pulse-slow" style="background:#f59e0b"></span>
-        <span class="mono text-xs uppercase tracking-widest" style="color:#f59e0b">En construcción · Próximamente</span>
-      </div>
-
-      <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight fade-up" style="animation-delay:.15s">
-        Apache Spark
-      </h1>
-
-      <p class="text-slate-400 text-lg leading-relaxed mb-10 fade-up" style="animation-delay:.2s">
-        Procesamiento distribuido del dataset ODS con Apache Spark y PySpark. Escala el análisis a millones de registros con transformaciones y queries en tiempo real.
-      </p>
-
-      <!-- Bullets de lo que vendrá -->
-      <div class="grid sm:grid-cols-2 gap-3 text-left mb-12 fade-up" style="animation-delay:.25s">
-                <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#f59e0b"></span>
-          <span class="text-sm text-slate-400">Carga y procesamiento del CSV con PySpark DataFrames</span>
+ 
+      {% if error %}
+      <div class="rounded-xl p-4 mb-8 mono text-sm" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:#f87171">&#9888; {{ error }}</div>
+      {% endif %}
+ 
+      {% if datos %}
+ 
+      <!-- 01 ESTADISTICAS -->
+      <section class="mb-10 fade-up">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="mono text-xs text-blue-400 tracking-widest uppercase">01 &mdash; Dataset</span>
+          <div class="flex-1 h-px bg-slate-800"></div>
         </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#f59e0b"></span>
-          <span class="text-sm text-slate-400">Queries SQL distribuidas sobre indicadores por región</span>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-blue-800 transition-colors">
+            <div class="text-2xl font-bold text-blue-400">{{ datos.estadisticas.total_registros }}</div>
+            <div class="mono text-xs text-slate-500 mt-1 uppercase tracking-wide">Registros</div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-blue-800 transition-colors">
+            <div class="text-2xl font-bold text-blue-400">{{ datos.estadisticas.total_paises }}</div>
+            <div class="mono text-xs text-slate-500 mt-1 uppercase tracking-wide">Paises</div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-blue-800 transition-colors">
+            <div class="text-2xl font-bold text-blue-400">{{ datos.estadisticas.total_regiones }}</div>
+            <div class="mono text-xs text-slate-500 mt-1 uppercase tracking-wide">Regiones</div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-blue-800 transition-colors">
+            <div class="text-2xl font-bold text-blue-400">{{ datos.estadisticas.total_indicadores }}</div>
+            <div class="mono text-xs text-slate-500 mt-1 uppercase tracking-wide">Indicadores</div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-blue-800 transition-colors">
+            <div class="text-2xl font-bold text-blue-400">{{ datos.estadisticas.año_min }}&ndash;{{ datos.estadisticas.año_max }}</div>
+            <div class="mono text-xs text-slate-500 mt-1 uppercase tracking-wide">Periodo</div>
+          </div>
         </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#f59e0b"></span>
-          <span class="text-sm text-slate-400">Agregaciones y ventanas temporales con Spark SQL</span>
+      </section>
+ 
+      <!-- 02 TOP PAISES -->
+      <section class="mb-10 fade-up">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="mono text-xs text-blue-400 tracking-widest uppercase">02 &mdash; Top 10 paises &middot; PIB per capita</span>
+          <div class="flex-1 h-px bg-slate-800"></div>
         </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#f59e0b"></span>
-          <span class="text-sm text-slate-400">Machine Learning con MLlib: regresión lineal sobre PIB</span>
+        <div class="chart-wrap"><canvas id="chartTop" height="90"></canvas></div>
+      </section>
+ 
+      <!-- 03 EVOLUCION ANUAL -->
+      <section class="mb-10 fade-up">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="mono text-xs text-blue-400 tracking-widest uppercase">03 &mdash; Evolucion anual de indicadores</span>
+          <div class="flex-1 h-px bg-slate-800"></div>
         </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#f59e0b"></span>
-          <span class="text-sm text-slate-400">Streaming de datos de nuevos indicadores en tiempo real</span>
+        <div class="chart-wrap mb-4"><canvas id="chartAnio" height="80"></canvas></div>
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="spark-table">
+            <thead>
+              <tr>
+                <th>Año</th><th>PIB per capita</th><th>Tasa desempleo</th>
+                <th>Esperanza de vida</th><th>Alfab. juvenil</th><th>Matric. primaria</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for fila in datos.por_año %}
+              <tr>
+                <td>{{ fila.get('Año','--') }}</td>
+                <td>{{ fila.get('PIB per cápita','--') }}</td>
+                <td>{{ fila.get('Tasa de desempleo','--') }}</td>
+                <td>{{ fila.get('Esperanza de vida','--') }}</td>
+                <td>{{ fila.get('Tasa de alfabetización juvenil','--') }}</td>
+                <td>{{ fila.get('Matriculación en primaria','--') }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
-        <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4">
-          <span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:#f59e0b"></span>
-          <span class="text-sm text-slate-400">Integración con Flask vía API de resultados Spark</span>
+      </section>
+ 
+      <!-- 04 KMEANS -->
+      <section class="mb-10 fade-up">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="mono text-xs text-blue-400 tracking-widest uppercase">04 &mdash; KMeans MLlib &middot; Clustering de paises</span>
+          <div class="flex-1 h-px bg-slate-800"></div>
         </div>
-      </div>
-
-      <!-- Acciones -->
-      <div class="flex flex-wrap gap-3 justify-center fade-up" style="animation-delay:.3s">
-        <a href="/dashboard"
-           class="bg-ocean-600 hover:bg-ocean-500 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors">
-          Ir al Dashboard
-        </a>
-        <a href="/"
-           class="border border-slate-700 hover:border-slate-600 text-slate-400 hover:text-slate-200 font-medium px-6 py-3 rounded-xl text-sm transition-colors">
-          ← Volver al inicio
-        </a>
-      </div>
-
+        {% if datos.ml_info and not datos.ml_info.get('error') %}
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          {% set cc = [('border-blue-500','text-blue-400'),('border-indigo-500','text-indigo-400'),('border-emerald-500','text-emerald-400'),('border-yellow-500','text-yellow-400')] %}
+          {% for k in range(datos.ml_info.k) %}
+            {% set count = datos.ml_clusters | selectattr('cluster','equalto', k) | list | length %}
+            {% if count > 0 %}
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center border-t-2 {{ cc[k][0] }}">
+              <div class="text-2xl font-bold {{ cc[k][1] }}">{{ count }}</div>
+              <div class="mono text-xs text-slate-500 mt-1">paises &middot; Cluster {{ k }}</div>
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+        <div class="grid sm:grid-cols-2 gap-4 mb-6">
+          <div class="chart-wrap">
+            <div class="mono text-xs text-slate-500 uppercase tracking-wide mb-3">Paises por cluster</div>
+            <canvas id="chartCBar" height="200"></canvas>
+          </div>
+          <div class="chart-wrap">
+            <div class="mono text-xs text-slate-500 uppercase tracking-wide mb-3">Proporcion</div>
+            <canvas id="chartCDona" height="200"></canvas>
+          </div>
+        </div>
+        <div class="chart-wrap mb-6">
+          <div class="mono text-xs text-slate-500 uppercase tracking-wide mb-3">Dispersion &mdash; PIB per capita vs Esperanza de vida</div>
+          <canvas id="chartScatter" height="130"></canvas>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 mb-6 mono text-xs text-slate-400">
+          <span class="text-slate-300 font-semibold">Variables:</span> {{ datos.ml_info.columnas_usadas | join(' - ') }}
+          &nbsp;|&nbsp; <span class="text-slate-300 font-semibold">k =</span> {{ datos.ml_info.k }}
+          &nbsp;|&nbsp; <span class="text-slate-300 font-semibold">Paises:</span> {{ datos.ml_info.total_paises_clasificados }}
+          &nbsp;|&nbsp; <span class="text-slate-300 font-semibold">Costo:</span> {{ datos.ml_info.costo }}
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+          {% for item in datos.ml_clusters | sort(attribute='cluster') %}
+          <div class="ci">
+            <span class="text-slate-300">{{ item.pais }}</span>
+            <span class="cb cb{{ item.cluster }}">C{{ item.cluster }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="rounded-xl p-4 mono text-sm" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:#f87171">
+          {{ datos.ml_info.get('error','Modelo no disponible') }}
+        </div>
+        {% endif %}
+      </section>
+ 
+      <!-- 05 BENCHMARK -->
+      <section class="mb-10 fade-up">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="mono text-xs text-blue-400 tracking-widest uppercase">05 &mdash; Comparacion de tiempos de procesamiento</span>
+          <div class="flex-1 h-px bg-slate-800"></div>
+        </div>
+        {% if datos.tiempos %}
+        <div class="grid sm:grid-cols-3 gap-4">
+          {% for r in datos.tiempos %}
+          <div class="tc tc{{ loop.index0 }}">
+            <div class="mono text-xs text-slate-500 mb-1">{{ r.configuracion }}</div>
+            <div class="font-semibold text-sm mb-2">{{ r.descripcion }}</div>
+            <div class="text-3xl font-bold {% if loop.index0 == 0 %}text-red-400{% elif loop.index0 == 1 %}text-yellow-400{% else %}text-emerald-400{% endif %}">
+              {% if r.tiempo_segundos %}{{ r.tiempo_segundos }}s{% else %}Error{% endif %}
+            </div>
+            <div class="mono text-xs text-slate-500 mt-2">{{ r.estado }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-slate-500 mono text-sm">No hay datos de benchmark disponibles.</p>
+        {% endif %}
+      </section>
+ 
+      {% endif %}
+ 
+      <!-- 06 NIVELES DE CONOCIMIENTO -->
+      <section class="mb-10 fade-up">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="mono text-xs text-yellow-400 tracking-widest uppercase">06 &mdash; Niveles de conocimiento &middot;</span>
+          <div class="flex-1 h-px bg-slate-800"></div>
+        </div>
+ 
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-blue-500">
+            <div class="mono text-xs text-blue-400 tracking-widest uppercase mb-2">Nivel 01</div>
+            <div class="font-bold text-lg mb-1">Conocimiento Evidente</div>
+            <div class="mono text-xs text-slate-500 mb-3 inline-block" style="background:#1e293b;padding:.3rem .6rem;border-radius:4px">Flask + Pandas + Chart.js</div>
+            <p class="text-slate-400 text-sm leading-relaxed mb-3">Dashboard interactivo sobre indicadores ODS del Banco Mundial. Filtros dinamicos por pais, ano e indicador. Visualizaciones con grafico de barras, linea, radar y ranking global.</p>
+            <div class="space-y-1">
+              <div class="mono text-xs text-slate-500">&rarr; Metodologia SEMMA</div>
+              <div class="mono text-xs text-slate-500">&rarr; 13,131 registros x 21 columnas</div>
+              <div class="mono text-xs text-slate-500">&rarr; Interpretacion automatica estadistica</div>
+              <div class="mono text-xs text-slate-500">&rarr; API REST con 8 endpoints</div>
+            </div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-indigo-500">
+            <div class="mono text-xs text-indigo-400 tracking-widest uppercase mb-2">Nivel 02</div>
+            <div class="font-bold text-lg mb-1">Conocimiento Multidimensional</div>
+            <div class="mono text-xs text-slate-500 mb-3 inline-block" style="background:#1e293b;padding:.3rem .6rem;border-radius:4px">SQL Server + OLAP + Flask</div>
+            <p class="text-slate-400 text-sm leading-relaxed mb-3">Modelo estrella sobre SQL Server con 249,470 hechos. Consultas OLAP: Roll-Up, Drill-Down, Slice, Dice, Ranking con RANK() OVER y analisis de tendencias por decada.</p>
+            <div class="space-y-1">
+              <div class="mono text-xs text-slate-500">&rarr; 4 dimensiones: tiempo, pais, region, indicador</div>
+              <div class="mono text-xs text-slate-500">&rarr; ETL en Python por lotes de 5,000</div>
+              <div class="mono text-xs text-slate-500">&rarr; 6 operaciones OLAP implementadas</div>
+              <div class="mono text-xs text-slate-500">&rarr; Fallback Pandas para Render</div>
+            </div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-emerald-500">
+            <div class="mono text-xs text-emerald-400 tracking-widest uppercase mb-2">Nivel 03</div>
+            <div class="font-bold text-lg mb-1">Conocimiento Oculto</div>
+            <div class="mono text-xs text-slate-500 mb-3 inline-block" style="background:#1e293b;padding:.3rem .6rem;border-radius:4px">Orange Data Mining + KDD</div>
+            <p class="text-slate-400 text-sm leading-relaxed mb-3">Metodologia KDD con tres algoritmos: K-Means (clustering demografico), Arbol de Decision (educacion terciaria como nodo raiz) y Reglas de Asociacion (capital humano vs. crecimiento del PIB).</p>
+            <div class="space-y-1">
+              <div class="mono text-xs text-slate-500">&rarr; K-Means con Silhouette Score</div>
+              <div class="mono text-xs text-slate-500">&rarr; Arbol de decision supervisado</div>
+              <div class="mono text-xs text-slate-500">&rarr; Reglas de asociacion (conf. &gt;40%)</div>
+              <div class="mono text-xs text-slate-500">&rarr; Exportacion a Flask via CSV</div>
+            </div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-yellow-500">
+            <div class="mono text-xs text-yellow-400 tracking-widest uppercase mb-2">Nivel 04</div>
+            <div class="font-bold text-lg mb-1">Conocimiento Profundo</div>
+            <div class="mono text-xs text-slate-500 mb-3 inline-block" style="background:#1e293b;padding:.3rem .6rem;border-radius:4px">PySpark 4.1.1 + MLlib</div>
+            <p class="text-slate-400 text-sm leading-relaxed mb-3">Procesamiento distribuido con Apache Spark. KMeans con MLlib sobre PIB per capita, desempleo, esperanza de vida y alfabetizacion. Benchmark de rendimiento con 3 configuraciones.</p>
+            <div class="space-y-1">
+              <div class="mono text-xs text-slate-500">&rarr; SparkSession con local[1], local[*], local[4]</div>
+              <div class="mono text-xs text-slate-500">&rarr; StandardScaler + VectorAssembler</div>
+              <div class="mono text-xs text-slate-500">&rarr; k=4 clusters, 202 paises clasificados</div>
+              <div class="mono text-xs text-slate-500">&rarr; Resultados precomputados en JSON</div>
+            </div>
+          </div>
+        </div>
+ 
+        <!-- Tabla comparativa -->
+        <div class="overflow-x-auto rounded-xl border border-slate-800 mb-10">
+          <table class="know-table">
+            <thead style="background:#0f172a">
+              <tr>
+                <th class="text-slate-400">Dimension</th>
+                <th class="text-blue-400">Nivel 1 &middot; Evidente</th>
+                <th class="text-indigo-400">Nivel 2 &middot; Multidimensional</th>
+                <th class="text-emerald-400">Nivel 3 &middot; Oculto</th>
+                <th class="text-yellow-400">Nivel 4 &middot; Profundo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Herramienta principal</td><td>Flask + Pandas + Chart.js</td><td>SQL Server + OLAP + Flask</td><td>Orange Data Mining</td><td>PySpark 4.1.1 + MLlib</td></tr>
+              <tr><td>Metodologia</td><td>SEMMA</td><td>Modelo Estrella OLAP</td><td>KDD</td><td>Procesamiento distribuido</td></tr>
+              <tr><td>Tipo de analisis</td><td>Descriptivo / Exploratorio</td><td>Multivariable / OLAP</td><td>Descubrimiento de patrones</td><td>Distribuido / Predictivo</td></tr>
+              <tr><td>Volumen procesado</td><td>13,131 registros en memoria</td><td>249,470 hechos en SQL Server</td><td>Muestra representativa</td><td>Dataset completo con Spark</td></tr>
+              <tr><td>Algoritmos / Operaciones</td><td>Estadisticas descriptivas, percentiles, z-score</td><td>Roll-Up, Drill-Down, Slice, Dice, Ranking, Tendencia</td><td>K-Means, Arbol de Decision, Reglas de Asociacion</td><td>KMeans MLlib, StandardScaler, VectorAssembler</td></tr>
+              <tr><td>Hallazgo principal</td><td>Top 10 paises concentran mas del 65% del PIB mundial</td><td>Europe y North America supera a Africa 10x en PIB per capita</td><td>Estructura demografica es el diferenciador primario entre paises</td><td>4 clusters con separacion clara en scatter PIB vs esperanza de vida</td></tr>
+              <tr><td>Complejidad tecnica</td><td>Baja</td><td>Media</td><td>Media-Alta</td><td>Alta</td></tr>
+              <tr><td>Escalabilidad</td><td>Limitada a RAM</td><td>Alta con indices SQL</td><td>Media &mdash; proceso local</td><td>Horizontal &mdash; workers</td></tr>
+              <tr><td>Integracion web</td><td>API REST desde Pandas</td><td>API OLAP + fallback Pandas</td><td>Exportacion CSV a Flask</td><td>JSON precomputado</td></tr>
+              <tr><td>Entrega</td><td>Entrega 1</td><td>Entrega 2</td><td>Entrega 3</td><td>Entrega 4 (actual)</td></tr>
+            </tbody>
+          </table>
+        </div>
+ 
+        <!-- Conclusiones Spark -->
+        <div class="flex items-center gap-3 mb-4">
+          <span class="mono text-xs text-yellow-400 tracking-widest uppercase">Conclusiones &mdash; Analisis con PySpark</span>
+          <div class="flex-1 h-px bg-slate-800"></div>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-4 mb-10">
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-yellow-500">
+            <div class="mono text-xs text-yellow-400 uppercase tracking-wide mb-2">01 &mdash; Procesamiento distribuido</div>
+            <p class="text-slate-400 text-sm leading-relaxed">Apache Spark 4.1.1 permitio procesar los 13,131 registros ODS con agrupaciones distribuidas, consultas analiticas y calculo de indicadores a escala. La configuracion local[*] aprovecho todos los nucleos disponibles, reduciendo el tiempo frente a local[1] de forma medible.</p>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-yellow-500">
+            <div class="mono text-xs text-yellow-400 uppercase tracking-wide mb-2">02 &mdash; KMeans con MLlib</div>
+            <p class="text-slate-400 text-sm leading-relaxed">El modelo KMeans con k=4 clasifico los 202 paises segun su comportamiento en PIB per capita, desempleo, esperanza de vida, alfabetizacion juvenil y matriculacion primaria. La separacion visible en el scatter confirma que los clusters capturan diferencias reales de desarrollo.</p>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-yellow-500">
+            <div class="mono text-xs text-yellow-400 uppercase tracking-wide mb-2">03 &mdash; Coherencia con niveles anteriores</div>
+            <p class="text-slate-400 text-sm leading-relaxed">Los clusters obtenidos con MLlib corroboran los hallazgos del Nivel 3 (Orange): la estructura demografica y el capital humano son predictores mas fuertes que el PIB crudo. El Nivel 4 anade rigor matematico distribuido a lo que Orange descubrio visualmente.</p>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-yellow-500">
+            <div class="mono text-xs text-yellow-400 uppercase tracking-wide mb-2">04 &mdash; Benchmark de configuraciones</div>
+            <p class="text-slate-400 text-sm leading-relaxed">La comparacion entre local[1], local[*] y local[4] evidencia que el paralelismo de Spark escala con los recursos disponibles. En un cluster real con workers fisicos separados, la diferencia de tiempos seria aun mas pronunciada con datasets de mayor volumen.</p>
+          </div>
+        </div>
+ 
+        <!-- Conclusiones Flask -->
+        <div class="flex items-center gap-3 mb-4">
+          <span class="mono text-xs text-blue-400 tracking-widest uppercase">Conclusiones &mdash; Proyecto completo ODS Explorer</span>
+          <div class="flex-1 h-px bg-slate-800"></div>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-blue-500">
+            <div class="mono text-xs text-blue-400 uppercase tracking-wide mb-2">01 &mdash; Flask como nucleo integrador</div>
+            <p class="text-slate-400 text-sm leading-relaxed">Flask demostro ser capaz de integrar cuatro tecnologias heterogeneas (Pandas, SQL Server, Orange y PySpark) bajo una unica interfaz web coherente. Su arquitectura ligera permitio escalar desde un dashboard simple hasta un sistema analitico de cuatro niveles sin cambiar el framework base.</p>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-blue-500">
+            <div class="mono text-xs text-blue-400 uppercase tracking-wide mb-2">02 &mdash; Progresion del conocimiento</div>
+            <p class="text-slate-400 text-sm leading-relaxed">El proyecto construyo una piramide donde cada nivel amplia al anterior: los KPIs evidentes del Nivel 1 se enriquecen con perspectivas OLAP en el Nivel 2, se profundizan con patrones ocultos en el Nivel 3, y se escalan con procesamiento distribuido en el Nivel 4.</p>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-blue-500">
+            <div class="mono text-xs text-blue-400 uppercase tracking-wide mb-2">03 &mdash; Dataset ODS como eje analitico</div>
+            <p class="text-slate-400 text-sm leading-relaxed">Los indicadores ODS del Banco Mundial (13,131 registros, 202 paises, 1960-2024) resultaron suficientemente ricos para sustentar analisis de cuatro niveles de complejidad creciente. La cobertura temporal permitio detectar eventos historicos (2008, COVID-19) como anomalias estadisticas verificables.</p>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-blue-500">
+            <div class="mono text-xs text-blue-400 uppercase tracking-wide mb-2">04 &mdash; Arquitecturas hibridas en produccion</div>
+            <p class="text-slate-400 text-sm leading-relaxed">La estrategia de precomputar resultados de PySpark en JSON y servirlos desde Flask resolvio la incompatibilidad de Spark con plataformas PaaS como Render. Este patron es valido en produccion real: el procesamiento pesado corre offline y la API sirve resultados estaticos con latencia minima.</p>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-blue-500">
+            <div class="mono text-xs text-blue-400 uppercase tracking-wide mb-2">05 &mdash; Impacto analitico del proyecto</div>
+            <p class="text-slate-400 text-sm leading-relaxed">Los cuatro niveles convergieron en un hallazgo comun: el desarrollo sostenible no esta determinado unicamente por el PIB. La educacion terciaria (Nivel 3), la estructura demografica (Nivel 3) y los indicadores laborales (Nivel 4) son predictores mas robustos que la riqueza acumulada como variable aislada.</p>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 border-t-2 border-t-blue-500">
+            <div class="mono text-xs text-blue-400 uppercase tracking-wide mb-2">06 &mdash; Despliegue continuo</div>
+            <p class="text-slate-400 text-sm leading-relaxed">La integracion GitHub hacia Render permitio un ciclo de entrega continua donde cada push a la rama main activo un build automatico. Esta practica de CI/CD aplicada desde la primera entrega garantizo que la aplicacion siempre estuvo disponible publicamente durante el desarrollo del proyecto.</p>
+          </div>
+        </div>
+ 
+      </section>
+ 
     </div>
   </main>
-
+ 
+<script>
+var C = ['#38bdf8','#818cf8','#34d399','#fbbf24'];
+var baseOpts = {
+  responsive: true,
+  plugins: { legend: { labels: { color: '#e2e8f0', font: { family: 'JetBrains Mono', size: 11 } } } },
+  scales: {
+    x: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: '#1e293b' } },
+    y: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: '#1e293b' } }
+  }
+};
+ 
+{% if datos and datos.top_paises %}
+new Chart(document.getElementById('chartTop'), {
+  type: 'bar',
+  data: {
+    labels: {{ datos.top_paises | map(attribute='País') | list | tojson }},
+    datasets: [{ label: 'PIB per capita (USD)',
+      data: {{ datos.top_paises | map(attribute='promedio') | list | tojson }},
+      backgroundColor: 'rgba(56,189,248,.6)', borderColor: '#38bdf8', borderWidth: 1, borderRadius: 4 }]
+  },
+  options: baseOpts
+});
+{% endif %}
+ 
+{% if datos and datos.por_año %}
+new Chart(document.getElementById('chartAnio'), {
+  type: 'line',
+  data: {
+    labels: {{ datos.por_año | map(attribute='Año') | list | tojson }},
+    datasets: [
+      { label: 'PIB per capita',
+        data: {{ datos.por_año | map(attribute='PIB per cápita') | list | tojson }},
+        borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,.06)', tension: 0.3, pointRadius: 2 },
+      { label: 'Tasa desempleo',
+        data: {{ datos.por_año | map(attribute='Tasa de desempleo') | list | tojson }},
+        borderColor: '#f87171', backgroundColor: 'rgba(248,113,113,.06)', tension: 0.3, pointRadius: 2 },
+      { label: 'Esperanza de vida',
+        data: {{ datos.por_año | map(attribute='Esperanza de vida') | list | tojson }},
+        borderColor: '#34d399', backgroundColor: 'rgba(52,211,153,.06)', tension: 0.3, pointRadius: 2 }
+    ]
+  },
+  options: baseOpts
+});
+{% endif %}
+ 
+{% if datos and datos.ml_clusters %}
+var clusters = {{ datos.ml_clusters | tojson }};
+var conteo = [0, 0, 0, 0];
+for (var i = 0; i < clusters.length; i++) { conteo[clusters[i].cluster]++; }
+ 
+var cLabels = [];
+var cVals = [];
+var cColors = [];
+for (var k = 0; k < 4; k++) {
+  if (conteo[k] > 0) {
+    cLabels.push('Cluster ' + k);
+    cVals.push(conteo[k]);
+    cColors.push(C[k]);
+  }
+}
+ 
+new Chart(document.getElementById('chartCBar'), {
+  type: 'bar',
+  data: { labels: cLabels, datasets: [{ label: 'Paises', data: cVals,
+    backgroundColor: cColors.map(function(c) { return c + '99'; }),
+    borderColor: cColors, borderWidth: 1, borderRadius: 4 }] },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: '#1e293b' } },
+      y: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: '#1e293b' } }
+    }
+  }
+});
+ 
+new Chart(document.getElementById('chartCDona'), {
+  type: 'doughnut',
+  data: { labels: cLabels, datasets: [{ data: cVals,
+    backgroundColor: cColors.map(function(c) { return c + 'cc'; }),
+    borderColor: '#0b1120', borderWidth: 3 }] },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom',
+      labels: { color: '#e2e8f0', font: { family: 'JetBrains Mono', size: 11 }, padding: 14 } } }
+  }
+});
+ 
+var scatterSets = [];
+for (var sk = 0; sk < 4; sk++) {
+  var pts = [];
+  for (var si = 0; si < clusters.length; si++) {
+    if (clusters[si].cluster === sk && clusters[si].pib != null && clusters[si].vida != null) {
+      pts.push({ x: clusters[si].pib, y: clusters[si].vida, label: clusters[si].pais });
+    }
+  }
+  if (pts.length > 0) {
+    scatterSets.push({ label: 'Cluster ' + sk, data: pts,
+      backgroundColor: C[sk] + 'bb', pointRadius: 5, pointHoverRadius: 9 });
+  }
+}
+ 
+new Chart(document.getElementById('chartScatter'), {
+  type: 'scatter',
+  data: { datasets: scatterSets },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { labels: { color: '#e2e8f0', font: { family: 'JetBrains Mono', size: 11 } } },
+      tooltip: { callbacks: { label: function(ctx) {
+        var x = ctx.raw.x ? ctx.raw.x.toFixed(0) : '?';
+        var y = ctx.raw.y ? ctx.raw.y.toFixed(1) : '?';
+        return ctx.raw.label + ' (' + x + ', ' + y + ')';
+      }}}
+    },
+    scales: {
+      x: {
+        title: { display: true, text: 'PIB per capita (USD)', color: '#64748b', font: { family: 'JetBrains Mono', size: 11 } },
+        ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } },
+        grid: { color: '#1e293b' }
+      },
+      y: {
+        title: { display: true, text: 'Esperanza de vida (anos)', color: '#64748b', font: { family: 'JetBrains Mono', size: 11 } },
+        ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } },
+        grid: { color: '#1e293b' }
+      }
+    }
+  }
+});
+{% endif %}
+</script>
 </body>
 </html>

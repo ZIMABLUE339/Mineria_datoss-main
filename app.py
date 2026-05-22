@@ -496,8 +496,27 @@ def orange():
 
 @app.route('/spark')
 def spark():
-    """Página Apache Spark"""
-    return render_template('spark.html')
+    """Página Apache Spark — Conocimiento Profundo"""
+    import json, os
+    json_path = os.path.join(BASE_DIR, 'data', 'spark_results.json')
+    try:
+        with open(json_path, encoding='utf-8') as f:
+            datos = json.load(f)
+        return render_template('spark.html', datos=datos, error=None)
+    except Exception as e:
+        return render_template('spark.html', datos=None, error=str(e))
+
+
+@app.route('/api/tiempos')
+def api_tiempos():
+    import json, os
+    json_path = os.path.join(BASE_DIR, 'data', 'spark_results.json')
+    try:
+        with open(json_path, encoding='utf-8') as f:
+            datos = json.load(f)
+        return jsonify({"ok": True, "resultados": datos.get("tiempos", [])})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
 
 
 # ==================== NIVEL 2 — MODELO MULTIDIMENSIONAL ====================

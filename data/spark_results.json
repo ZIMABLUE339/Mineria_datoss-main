@@ -1,0 +1,1891 @@
+{
+  "estadisticas": {
+    "total_registros": 13130,
+    "total_paises": 202,
+    "total_regiones": 8,
+    "año_min": 1960,
+    "año_max": 2024,
+    "total_indicadores": 18
+  },
+  "top_paises": [
+    {
+      "País": "China",
+      "promedio": 33628.68
+    },
+    {
+      "País": "Faroes",
+      "promedio": 33056.65
+    },
+    {
+      "País": "Montenegro",
+      "promedio": 33004.62
+    },
+    {
+      "País": "Central African Republic",
+      "promedio": 32667.41
+    },
+    {
+      "País": "Türkiye",
+      "promedio": 32534.22
+    },
+    {
+      "País": "Latvia",
+      "promedio": 32264.26
+    },
+    {
+      "País": "Seychelles",
+      "promedio": 32244.85
+    },
+    {
+      "País": "Bulgaria",
+      "promedio": 32188.21
+    },
+    {
+      "País": "Estonia",
+      "promedio": 32179.2
+    },
+    {
+      "País": "Bahrain",
+      "promedio": 32074.06
+    }
+  ],
+  "por_año": [
+    {
+      "Año": 1960,
+      "PIB per cápita": 30905.46,
+      "Tasa de desempleo": 25.66,
+      "Esperanza de vida": 60.67,
+      "Tasa de alfabetización juvenil": 53.69,
+      "Matriculación en primaria": 143.36
+    },
+    {
+      "Año": 1961,
+      "PIB per cápita": 30415.84,
+      "Tasa de desempleo": 27.19,
+      "Esperanza de vida": 61.57,
+      "Tasa de alfabetización juvenil": 50.49,
+      "Matriculación en primaria": 144.66
+    },
+    {
+      "Año": 1962,
+      "PIB per cápita": 29629.76,
+      "Tasa de desempleo": 26.41,
+      "Esperanza de vida": 61.36,
+      "Tasa de alfabetización juvenil": 49.89,
+      "Matriculación en primaria": 143.76
+    },
+    {
+      "Año": 1963,
+      "PIB per cápita": 29535.18,
+      "Tasa de desempleo": 26.16,
+      "Esperanza de vida": 58.86,
+      "Tasa de alfabetización juvenil": 49.84,
+      "Matriculación en primaria": 147.58
+    },
+    {
+      "Año": 1964,
+      "PIB per cápita": 29364.24,
+      "Tasa de desempleo": 24.31,
+      "Esperanza de vida": 64.6,
+      "Tasa de alfabetización juvenil": 53.92,
+      "Matriculación en primaria": 147.43
+    },
+    {
+      "Año": 1965,
+      "PIB per cápita": 30455.86,
+      "Tasa de desempleo": 23.55,
+      "Esperanza de vida": 61.38,
+      "Tasa de alfabetización juvenil": 51.57,
+      "Matriculación en primaria": 144.66
+    },
+    {
+      "Año": 1966,
+      "PIB per cápita": 29566.99,
+      "Tasa de desempleo": 26.41,
+      "Esperanza de vida": 57.51,
+      "Tasa de alfabetización juvenil": 49.56,
+      "Matriculación en primaria": 148.47
+    },
+    {
+      "Año": 1967,
+      "PIB per cápita": 30327.59,
+      "Tasa de desempleo": 25.27,
+      "Esperanza de vida": 60.78,
+      "Tasa de alfabetización juvenil": 48.96,
+      "Matriculación en primaria": 146.91
+    },
+    {
+      "Año": 1968,
+      "PIB per cápita": 29249.42,
+      "Tasa de desempleo": 23.6,
+      "Esperanza de vida": 60.49,
+      "Tasa de alfabetización juvenil": 51.88,
+      "Matriculación en primaria": 144.0
+    },
+    {
+      "Año": 1969,
+      "PIB per cápita": 29523.44,
+      "Tasa de desempleo": 24.66,
+      "Esperanza de vida": 60.44,
+      "Tasa de alfabetización juvenil": 48.9,
+      "Matriculación en primaria": 144.32
+    },
+    {
+      "Año": 1970,
+      "PIB per cápita": 29747.56,
+      "Tasa de desempleo": 24.01,
+      "Esperanza de vida": 55.36,
+      "Tasa de alfabetización juvenil": 50.51,
+      "Matriculación en primaria": 140.41
+    },
+    {
+      "Año": 1971,
+      "PIB per cápita": 28836.48,
+      "Tasa de desempleo": 25.48,
+      "Esperanza de vida": 55.95,
+      "Tasa de alfabetización juvenil": 50.13,
+      "Matriculación en primaria": 145.87
+    },
+    {
+      "Año": 1972,
+      "PIB per cápita": 29927.26,
+      "Tasa de desempleo": 25.14,
+      "Esperanza de vida": 57.57,
+      "Tasa de alfabetización juvenil": 50.53,
+      "Matriculación en primaria": 145.48
+    },
+    {
+      "Año": 1973,
+      "PIB per cápita": 28859.71,
+      "Tasa de desempleo": 25.17,
+      "Esperanza de vida": 59.74,
+      "Tasa de alfabetización juvenil": 48.26,
+      "Matriculación en primaria": 147.37
+    },
+    {
+      "Año": 1974,
+      "PIB per cápita": 30551.43,
+      "Tasa de desempleo": 23.87,
+      "Esperanza de vida": 60.45,
+      "Tasa de alfabetización juvenil": 48.41,
+      "Matriculación en primaria": 143.71
+    },
+    {
+      "Año": 1975,
+      "PIB per cápita": 29556.27,
+      "Tasa de desempleo": 24.62,
+      "Esperanza de vida": 61.52,
+      "Tasa de alfabetización juvenil": 48.98,
+      "Matriculación en primaria": 147.24
+    },
+    {
+      "Año": 1976,
+      "PIB per cápita": 29374.4,
+      "Tasa de desempleo": 24.52,
+      "Esperanza de vida": 64.17,
+      "Tasa de alfabetización juvenil": 50.25,
+      "Matriculación en primaria": 144.77
+    },
+    {
+      "Año": 1977,
+      "PIB per cápita": 29276.36,
+      "Tasa de desempleo": 24.12,
+      "Esperanza de vida": 64.36,
+      "Tasa de alfabetización juvenil": 52.31,
+      "Matriculación en primaria": 146.96
+    },
+    {
+      "Año": 1978,
+      "PIB per cápita": 30964.3,
+      "Tasa de desempleo": 26.75,
+      "Esperanza de vida": 60.42,
+      "Tasa de alfabetización juvenil": 52.53,
+      "Matriculación en primaria": 143.7
+    },
+    {
+      "Año": 1979,
+      "PIB per cápita": 29447.08,
+      "Tasa de desempleo": 24.9,
+      "Esperanza de vida": 62.68,
+      "Tasa de alfabetización juvenil": 52.89,
+      "Matriculación en primaria": 145.03
+    },
+    {
+      "Año": 1980,
+      "PIB per cápita": 29712.52,
+      "Tasa de desempleo": 24.14,
+      "Esperanza de vida": 56.58,
+      "Tasa de alfabetización juvenil": 50.32,
+      "Matriculación en primaria": 143.36
+    },
+    {
+      "Año": 1981,
+      "PIB per cápita": 29992.1,
+      "Tasa de desempleo": 23.42,
+      "Esperanza de vida": 59.24,
+      "Tasa de alfabetización juvenil": 51.19,
+      "Matriculación en primaria": 146.87
+    },
+    {
+      "Año": 1982,
+      "PIB per cápita": 30288.91,
+      "Tasa de desempleo": 25.81,
+      "Esperanza de vida": 62.11,
+      "Tasa de alfabetización juvenil": 49.7,
+      "Matriculación en primaria": 143.06
+    },
+    {
+      "Año": 1983,
+      "PIB per cápita": 30852.8,
+      "Tasa de desempleo": 24.57,
+      "Esperanza de vida": 54.74,
+      "Tasa de alfabetización juvenil": 52.54,
+      "Matriculación en primaria": 143.39
+    },
+    {
+      "Año": 1984,
+      "PIB per cápita": 30092.08,
+      "Tasa de desempleo": 26.41,
+      "Esperanza de vida": 56.08,
+      "Tasa de alfabetización juvenil": 51.92,
+      "Matriculación en primaria": 146.97
+    },
+    {
+      "Año": 1985,
+      "PIB per cápita": 29308.91,
+      "Tasa de desempleo": 24.58,
+      "Esperanza de vida": 60.4,
+      "Tasa de alfabetización juvenil": 50.02,
+      "Matriculación en primaria": 146.54
+    },
+    {
+      "Año": 1986,
+      "PIB per cápita": 29417.85,
+      "Tasa de desempleo": 24.96,
+      "Esperanza de vida": 58.49,
+      "Tasa de alfabetización juvenil": 50.33,
+      "Matriculación en primaria": 148.61
+    },
+    {
+      "Año": 1987,
+      "PIB per cápita": 29613.32,
+      "Tasa de desempleo": 24.67,
+      "Esperanza de vida": 56.5,
+      "Tasa de alfabetización juvenil": 48.31,
+      "Matriculación en primaria": 144.36
+    },
+    {
+      "Año": 1988,
+      "PIB per cápita": 31046.8,
+      "Tasa de desempleo": 23.98,
+      "Esperanza de vida": 61.64,
+      "Tasa de alfabetización juvenil": 50.31,
+      "Matriculación en primaria": 143.09
+    },
+    {
+      "Año": 1989,
+      "PIB per cápita": 30219.91,
+      "Tasa de desempleo": 25.08,
+      "Esperanza de vida": 61.43,
+      "Tasa de alfabetización juvenil": 50.25,
+      "Matriculación en primaria": 151.56
+    },
+    {
+      "Año": 1990,
+      "PIB per cápita": 28636.19,
+      "Tasa de desempleo": 23.91,
+      "Esperanza de vida": 64.47,
+      "Tasa de alfabetización juvenil": 49.13,
+      "Matriculación en primaria": 143.41
+    },
+    {
+      "Año": 1991,
+      "PIB per cápita": 29362.43,
+      "Tasa de desempleo": 24.35,
+      "Esperanza de vida": 60.35,
+      "Tasa de alfabetización juvenil": 52.57,
+      "Matriculación en primaria": 143.27
+    },
+    {
+      "Año": 1992,
+      "PIB per cápita": 28567.28,
+      "Tasa de desempleo": 24.19,
+      "Esperanza de vida": 59.97,
+      "Tasa de alfabetización juvenil": 52.16,
+      "Matriculación en primaria": 147.84
+    },
+    {
+      "Año": 1993,
+      "PIB per cápita": 29292.31,
+      "Tasa de desempleo": 26.38,
+      "Esperanza de vida": 59.99,
+      "Tasa de alfabetización juvenil": 53.15,
+      "Matriculación en primaria": 147.29
+    },
+    {
+      "Año": 1994,
+      "PIB per cápita": 28684.74,
+      "Tasa de desempleo": 23.84,
+      "Esperanza de vida": 57.61,
+      "Tasa de alfabetización juvenil": 51.22,
+      "Matriculación en primaria": 146.99
+    },
+    {
+      "Año": 1995,
+      "PIB per cápita": 30297.82,
+      "Tasa de desempleo": 26.39,
+      "Esperanza de vida": 59.56,
+      "Tasa de alfabetización juvenil": 50.68,
+      "Matriculación en primaria": 148.52
+    },
+    {
+      "Año": 1996,
+      "PIB per cápita": 30296.11,
+      "Tasa de desempleo": 25.2,
+      "Esperanza de vida": 56.03,
+      "Tasa de alfabetización juvenil": 51.07,
+      "Matriculación en primaria": 145.15
+    },
+    {
+      "Año": 1997,
+      "PIB per cápita": 29794.48,
+      "Tasa de desempleo": 24.82,
+      "Esperanza de vida": 61.3,
+      "Tasa de alfabetización juvenil": 50.96,
+      "Matriculación en primaria": 146.72
+    },
+    {
+      "Año": 1998,
+      "PIB per cápita": 28003.85,
+      "Tasa de desempleo": 27.77,
+      "Esperanza de vida": 59.21,
+      "Tasa de alfabetización juvenil": 50.75,
+      "Matriculación en primaria": 145.03
+    },
+    {
+      "Año": 1999,
+      "PIB per cápita": 29822.15,
+      "Tasa de desempleo": 25.16,
+      "Esperanza de vida": 58.71,
+      "Tasa de alfabetización juvenil": 50.12,
+      "Matriculación en primaria": 146.65
+    },
+    {
+      "Año": 2000,
+      "PIB per cápita": 29736.75,
+      "Tasa de desempleo": 25.47,
+      "Esperanza de vida": 59.75,
+      "Tasa de alfabetización juvenil": 51.34,
+      "Matriculación en primaria": 145.28
+    },
+    {
+      "Año": 2001,
+      "PIB per cápita": 32143.4,
+      "Tasa de desempleo": 25.66,
+      "Esperanza de vida": 57.78,
+      "Tasa de alfabetización juvenil": 52.27,
+      "Matriculación en primaria": 147.01
+    },
+    {
+      "Año": 2002,
+      "PIB per cápita": 30649.2,
+      "Tasa de desempleo": 24.38,
+      "Esperanza de vida": 56.58,
+      "Tasa de alfabetización juvenil": 48.86,
+      "Matriculación en primaria": 145.9
+    },
+    {
+      "Año": 2003,
+      "PIB per cápita": 29145.55,
+      "Tasa de desempleo": 25.1,
+      "Esperanza de vida": 60.09,
+      "Tasa de alfabetización juvenil": 50.95,
+      "Matriculación en primaria": 145.8
+    },
+    {
+      "Año": 2004,
+      "PIB per cápita": 29775.13,
+      "Tasa de desempleo": 22.95,
+      "Esperanza de vida": 57.93,
+      "Tasa de alfabetización juvenil": 51.18,
+      "Matriculación en primaria": 148.59
+    },
+    {
+      "Año": 2005,
+      "PIB per cápita": 30226.49,
+      "Tasa de desempleo": 26.58,
+      "Esperanza de vida": 57.94,
+      "Tasa de alfabetización juvenil": 52.6,
+      "Matriculación en primaria": 141.5
+    },
+    {
+      "Año": 2006,
+      "PIB per cápita": 29483.75,
+      "Tasa de desempleo": 24.39,
+      "Esperanza de vida": 59.37,
+      "Tasa de alfabetización juvenil": 49.48,
+      "Matriculación en primaria": 142.97
+    },
+    {
+      "Año": 2007,
+      "PIB per cápita": 28544.85,
+      "Tasa de desempleo": 25.99,
+      "Esperanza de vida": 56.35,
+      "Tasa de alfabetización juvenil": 50.28,
+      "Matriculación en primaria": 146.08
+    },
+    {
+      "Año": 2008,
+      "PIB per cápita": 29231.18,
+      "Tasa de desempleo": 25.27,
+      "Esperanza de vida": 61.31,
+      "Tasa de alfabetización juvenil": 47.43,
+      "Matriculación en primaria": 145.21
+    },
+    {
+      "Año": 2009,
+      "PIB per cápita": 29310.96,
+      "Tasa de desempleo": 24.99,
+      "Esperanza de vida": 59.87,
+      "Tasa de alfabetización juvenil": 51.18,
+      "Matriculación en primaria": 148.73
+    },
+    {
+      "Año": 2010,
+      "PIB per cápita": 29187.7,
+      "Tasa de desempleo": 26.23,
+      "Esperanza de vida": 58.21,
+      "Tasa de alfabetización juvenil": 50.8,
+      "Matriculación en primaria": 142.68
+    },
+    {
+      "Año": 2011,
+      "PIB per cápita": 29347.35,
+      "Tasa de desempleo": 25.83,
+      "Esperanza de vida": 57.26,
+      "Tasa de alfabetización juvenil": 48.64,
+      "Matriculación en primaria": 139.97
+    },
+    {
+      "Año": 2012,
+      "PIB per cápita": 29275.75,
+      "Tasa de desempleo": 23.31,
+      "Esperanza de vida": 61.22,
+      "Tasa de alfabetización juvenil": 50.21,
+      "Matriculación en primaria": 145.54
+    },
+    {
+      "Año": 2013,
+      "PIB per cápita": 29656.99,
+      "Tasa de desempleo": 25.46,
+      "Esperanza de vida": 58.02,
+      "Tasa de alfabetización juvenil": 50.97,
+      "Matriculación en primaria": 143.84
+    },
+    {
+      "Año": 2014,
+      "PIB per cápita": 30176.48,
+      "Tasa de desempleo": 25.07,
+      "Esperanza de vida": 57.53,
+      "Tasa de alfabetización juvenil": 53.03,
+      "Matriculación en primaria": 148.68
+    },
+    {
+      "Año": 2015,
+      "PIB per cápita": 30276.55,
+      "Tasa de desempleo": 25.22,
+      "Esperanza de vida": 57.14,
+      "Tasa de alfabetización juvenil": 52.85,
+      "Matriculación en primaria": 143.75
+    },
+    {
+      "Año": 2016,
+      "PIB per cápita": 30500.31,
+      "Tasa de desempleo": 25.55,
+      "Esperanza de vida": 62.73,
+      "Tasa de alfabetización juvenil": 49.72,
+      "Matriculación en primaria": 147.07
+    },
+    {
+      "Año": 2017,
+      "PIB per cápita": 29302.98,
+      "Tasa de desempleo": 23.58,
+      "Esperanza de vida": 57.88,
+      "Tasa de alfabetización juvenil": 50.46,
+      "Matriculación en primaria": 145.7
+    },
+    {
+      "Año": 2018,
+      "PIB per cápita": 29617.56,
+      "Tasa de desempleo": 25.01,
+      "Esperanza de vida": 60.8,
+      "Tasa de alfabetización juvenil": 46.77,
+      "Matriculación en primaria": 146.57
+    },
+    {
+      "Año": 2019,
+      "PIB per cápita": 28964.93,
+      "Tasa de desempleo": 25.04,
+      "Esperanza de vida": 61.32,
+      "Tasa de alfabetización juvenil": 50.32,
+      "Matriculación en primaria": 150.57
+    },
+    {
+      "Año": 2020,
+      "PIB per cápita": 29956.15,
+      "Tasa de desempleo": 25.43,
+      "Esperanza de vida": 54.6,
+      "Tasa de alfabetización juvenil": 53.03,
+      "Matriculación en primaria": 143.33
+    },
+    {
+      "Año": 2021,
+      "PIB per cápita": 29925.54,
+      "Tasa de desempleo": 25.51,
+      "Esperanza de vida": 59.54,
+      "Tasa de alfabetización juvenil": 49.98,
+      "Matriculación en primaria": 144.59
+    },
+    {
+      "Año": 2022,
+      "PIB per cápita": 30321.47,
+      "Tasa de desempleo": 25.19,
+      "Esperanza de vida": 60.65,
+      "Tasa de alfabetización juvenil": 48.26,
+      "Matriculación en primaria": 147.14
+    },
+    {
+      "Año": 2023,
+      "PIB per cápita": 30309.84,
+      "Tasa de desempleo": 26.24,
+      "Esperanza de vida": 64.05,
+      "Tasa de alfabetización juvenil": 51.69,
+      "Matriculación en primaria": 142.4
+    },
+    {
+      "Año": 2024,
+      "PIB per cápita": 30325.55,
+      "Tasa de desempleo": 23.9,
+      "Esperanza de vida": 63.31,
+      "Tasa de alfabetización juvenil": 52.2,
+      "Matriculación en primaria": 147.64
+    }
+  ],
+  "por_region": [
+    {
+      "region": "Africa",
+      "pib": 29826.93,
+      "desempleo": 24.96,
+      "vida": 59.61
+    },
+    {
+      "region": "Arab States",
+      "pib": 30595.31,
+      "desempleo": 24.32,
+      "vida": 59.12
+    },
+    {
+      "region": "Arab States, Africa",
+      "pib": 29278.2,
+      "desempleo": 26.06,
+      "vida": 61.34
+    },
+    {
+      "region": "Arab States, Asia and the Pacific",
+      "pib": 29398.65,
+      "desempleo": 27.77,
+      "vida": 57.65
+    },
+    {
+      "region": "Asia and the Pacific",
+      "pib": 29629.1,
+      "desempleo": 25.01,
+      "vida": 59.49
+    },
+    {
+      "region": "Europe and North America",
+      "pib": 29796.38,
+      "desempleo": 25.28,
+      "vida": 59.0
+    },
+    {
+      "region": "Europe and North America, Asia and the Pacific",
+      "pib": 29440.66,
+      "desempleo": 26.65,
+      "vida": 58.45
+    },
+    {
+      "region": "Latin America and the Caribbean",
+      "pib": 29685.11,
+      "desempleo": 24.65,
+      "vida": 60.55
+    }
+  ],
+  "indicadores": [
+    "PIB Total",
+    "Tasa de crecimiento del PIB",
+    "PIB per cápita",
+    "Tasa de alfabetización juvenil",
+    "Tasa de alfabetización de adultos",
+    "Matriculación en primaria",
+    "Matriculación en secundaria",
+    "Matriculación en escuelas terciarias",
+    "Población activa Mujer",
+    "Población activa Hombres",
+    "Población activa Total",
+    "Tasa de desempleo",
+    "Esperanza de vida",
+    "Población de 0 a 14 años",
+    "Población de 15 a 64 años",
+    "Población mayor de 65 años",
+    "Población Total",
+    "Población femenina y masculina"
+  ],
+  "primer_indicador": "PIB per cápita",
+  "ml_info": {
+    "k": 4,
+    "columnas_usadas": [
+      "PIB per cápita",
+      "Tasa de desempleo",
+      "Esperanza de vida",
+      "Tasa de alfabetización juvenil",
+      "Matriculación en primaria"
+    ],
+    "total_paises_clasificados": 202,
+    "costo": 658.6042
+  },
+  "ml_clusters": [
+    {
+      "pais": "Côte d'Ivoire",
+      "cluster": 1,
+      "pib": 31424.7815,
+      "vida": 62.618
+    },
+    {
+      "pais": "Chad",
+      "cluster": 3,
+      "pib": 28612.8764,
+      "vida": 52.6971
+    },
+    {
+      "pais": "Micronesia (Federated States of)",
+      "cluster": 2,
+      "pib": 31045.3486,
+      "vida": 55.9063
+    },
+    {
+      "pais": "Paraguay",
+      "cluster": 0,
+      "pib": 29046.45,
+      "vida": 59.8209
+    },
+    {
+      "pais": "Yemen",
+      "cluster": 2,
+      "pib": 28893.4809,
+      "vida": 56.0145
+    },
+    {
+      "pais": "State of Palestine",
+      "cluster": 2,
+      "pib": 31259.4215,
+      "vida": 56.2758
+    },
+    {
+      "pais": "Senegal",
+      "cluster": 0,
+      "pib": 29040.8132,
+      "vida": 65.2572
+    },
+    {
+      "pais": "Sweden",
+      "cluster": 3,
+      "pib": 28855.582,
+      "vida": 55.9445
+    },
+    {
+      "pais": "Cabo Verde",
+      "cluster": 1,
+      "pib": 29598.3926,
+      "vida": 57.662
+    },
+    {
+      "pais": "Macao, China",
+      "cluster": 1,
+      "pib": 27511.5634,
+      "vida": 65.6806
+    },
+    {
+      "pais": "Kiribati",
+      "cluster": 2,
+      "pib": 31134.6743,
+      "vida": 52.4792
+    },
+    {
+      "pais": "Republic of Korea",
+      "cluster": 3,
+      "pib": 28516.7707,
+      "vida": 53.8268
+    },
+    {
+      "pais": "Guyana",
+      "cluster": 3,
+      "pib": 26834.3602,
+      "vida": 56.788
+    },
+    {
+      "pais": "Eritrea",
+      "cluster": 1,
+      "pib": 31204.4516,
+      "vida": 63.5745
+    },
+    {
+      "pais": "Philippines",
+      "cluster": 0,
+      "pib": 28498.707,
+      "vida": 63.3642
+    },
+    {
+      "pais": "Tonga",
+      "cluster": 2,
+      "pib": 29604.9466,
+      "vida": 60.0185
+    },
+    {
+      "pais": "Djibouti",
+      "cluster": 3,
+      "pib": 26032.2141,
+      "vida": 62.7165
+    },
+    {
+      "pais": "Singapore",
+      "cluster": 0,
+      "pib": 28999.9594,
+      "vida": 60.9366
+    },
+    {
+      "pais": "Malaysia",
+      "cluster": 0,
+      "pib": 29670.4185,
+      "vida": 64.0974
+    },
+    {
+      "pais": "Fiji",
+      "cluster": 0,
+      "pib": 30886.5608,
+      "vida": 61.7595
+    },
+    {
+      "pais": "Malawi",
+      "cluster": 1,
+      "pib": 29561.6389,
+      "vida": 59.674
+    },
+    {
+      "pais": "Iraq",
+      "cluster": 2,
+      "pib": 29398.6492,
+      "vida": 57.6452
+    },
+    {
+      "pais": "Germany",
+      "cluster": 1,
+      "pib": 30327.8483,
+      "vida": 65.4285
+    },
+    {
+      "pais": "Comoros",
+      "cluster": 1,
+      "pib": 31995.7687,
+      "vida": 61.0245
+    },
+    {
+      "pais": "Afghanistan",
+      "cluster": 1,
+      "pib": 30790.6733,
+      "vida": 63.836
+    },
+    {
+      "pais": "Cambodia",
+      "cluster": 2,
+      "pib": 29922.6786,
+      "vida": 60.3538
+    },
+    {
+      "pais": "Rwanda",
+      "cluster": 2,
+      "pib": 30514.9011,
+      "vida": 56.9474
+    },
+    {
+      "pais": "Jordan",
+      "cluster": 1,
+      "pib": 31208.4638,
+      "vida": 61.9738
+    },
+    {
+      "pais": "Maldives",
+      "cluster": 2,
+      "pib": 29166.3382,
+      "vida": 56.9715
+    },
+    {
+      "pais": "Sudan",
+      "cluster": 2,
+      "pib": 30898.9803,
+      "vida": 55.9929
+    },
+    {
+      "pais": "Palau",
+      "cluster": 0,
+      "pib": 28681.7497,
+      "vida": 67.0995
+    },
+    {
+      "pais": "France",
+      "cluster": 2,
+      "pib": 29944.5639,
+      "vida": 52.826
+    },
+    {
+      "pais": "Greece",
+      "cluster": 3,
+      "pib": 27902.5613,
+      "vida": 57.2477
+    },
+    {
+      "pais": "Sri Lanka",
+      "cluster": 3,
+      "pib": 28767.3214,
+      "vida": 56.5732
+    },
+    {
+      "pais": "British Virgin Islands",
+      "cluster": 0,
+      "pib": 31247.1611,
+      "vida": 64.0737
+    },
+    {
+      "pais": "Dominica",
+      "cluster": 1,
+      "pib": 29425.949,
+      "vida": 62.3042
+    },
+    {
+      "pais": "Togo",
+      "cluster": 3,
+      "pib": 29723.5513,
+      "vida": 47.4215
+    },
+    {
+      "pais": "Algeria",
+      "cluster": 0,
+      "pib": 30515.6405,
+      "vida": 63.44
+    },
+    {
+      "pais": "Equatorial Guinea",
+      "cluster": 3,
+      "pib": 27297.0903,
+      "vida": 56.6892
+    },
+    {
+      "pais": "Slovakia",
+      "cluster": 3,
+      "pib": 28391.4318,
+      "vida": 52.8452
+    },
+    {
+      "pais": "Argentina",
+      "cluster": 1,
+      "pib": 30787.86,
+      "vida": 60.5092
+    },
+    {
+      "pais": "Angola",
+      "cluster": 0,
+      "pib": 30510.1605,
+      "vida": 62.9843
+    },
+    {
+      "pais": "Belgium",
+      "cluster": 0,
+      "pib": 28628.789,
+      "vida": 63.9482
+    },
+    {
+      "pais": "San Marino",
+      "cluster": 2,
+      "pib": 30718.1961,
+      "vida": 59.8094
+    },
+    {
+      "pais": "Ecuador",
+      "cluster": 3,
+      "pib": 28798.5081,
+      "vida": 56.3682
+    },
+    {
+      "pais": "Qatar",
+      "cluster": 1,
+      "pib": 31221.5256,
+      "vida": 60.2668
+    },
+    {
+      "pais": "Lesotho",
+      "cluster": 0,
+      "pib": 29411.9514,
+      "vida": 63.8989
+    },
+    {
+      "pais": "Faroes",
+      "cluster": 2,
+      "pib": 33056.6517,
+      "vida": 53.8269
+    },
+    {
+      "pais": "Albania",
+      "cluster": 2,
+      "pib": 29955.1744,
+      "vida": 59.6717
+    },
+    {
+      "pais": "Madagascar",
+      "cluster": 3,
+      "pib": 28197.4475,
+      "vida": 54.8111
+    },
+    {
+      "pais": "Finland",
+      "cluster": 1,
+      "pib": 29343.6808,
+      "vida": 64.6368
+    },
+    {
+      "pais": "Türkiye",
+      "cluster": 1,
+      "pib": 32534.2205,
+      "vida": 58.7363
+    },
+    {
+      "pais": "New Caledonia",
+      "cluster": 1,
+      "pib": 29667.1457,
+      "vida": 61.8032
+    },
+    {
+      "pais": "Ghana",
+      "cluster": 2,
+      "pib": 31236.001,
+      "vida": 60.7775
+    },
+    {
+      "pais": "Myanmar",
+      "cluster": 2,
+      "pib": 32003.7632,
+      "vida": 56.4905
+    },
+    {
+      "pais": "Nicaragua",
+      "cluster": 2,
+      "pib": 30212.1754,
+      "vida": 57.4826
+    },
+    {
+      "pais": "Brunei Darussalam",
+      "cluster": 2,
+      "pib": 31705.933,
+      "vida": 64.9129
+    },
+    {
+      "pais": "Sierra Leone",
+      "cluster": 2,
+      "pib": 31044.8003,
+      "vida": 55.3829
+    },
+    {
+      "pais": "Benin",
+      "cluster": 0,
+      "pib": 30828.8098,
+      "vida": 64.6409
+    },
+    {
+      "pais": "Peru",
+      "cluster": 1,
+      "pib": 30254.905,
+      "vida": 56.8354
+    },
+    {
+      "pais": "Bahamas",
+      "cluster": 0,
+      "pib": 31024.0094,
+      "vida": 65.3888
+    },
+    {
+      "pais": "China",
+      "cluster": 0,
+      "pib": 33628.6829,
+      "vida": 63.4298
+    },
+    {
+      "pais": "India",
+      "cluster": 0,
+      "pib": 28470.0609,
+      "vida": 68.9998
+    },
+    {
+      "pais": "Belarus",
+      "cluster": 2,
+      "pib": 29111.7965,
+      "vida": 60.1245
+    },
+    {
+      "pais": "Timor-Leste",
+      "cluster": 0,
+      "pib": 29380.5902,
+      "vida": 63.8611
+    },
+    {
+      "pais": "Kuwait",
+      "cluster": 2,
+      "pib": 30363.5992,
+      "vida": 55.1597
+    },
+    {
+      "pais": "Malta",
+      "cluster": 2,
+      "pib": 30384.9977,
+      "vida": 58.8031
+    },
+    {
+      "pais": "Sao Tome and Principe",
+      "cluster": 2,
+      "pib": 29290.9588,
+      "vida": 56.7071
+    },
+    {
+      "pais": "Somalia",
+      "cluster": 3,
+      "pib": 29562.7427,
+      "vida": 57.0085
+    },
+    {
+      "pais": "Tuvalu",
+      "cluster": 1,
+      "pib": 31496.4799,
+      "vida": 65.1815
+    },
+    {
+      "pais": "Marshall Islands",
+      "cluster": 0,
+      "pib": 30367.2865,
+      "vida": 61.6275
+    },
+    {
+      "pais": "Tajikistan",
+      "cluster": 0,
+      "pib": 28234.5109,
+      "vida": 60.3702
+    },
+    {
+      "pais": "Chile",
+      "cluster": 2,
+      "pib": 30644.5011,
+      "vida": 51.4166
+    },
+    {
+      "pais": "United Republic of Tanzania",
+      "cluster": 3,
+      "pib": 27908.9926,
+      "vida": 57.5392
+    },
+    {
+      "pais": "Cayman Islands",
+      "cluster": 3,
+      "pib": 28260.5171,
+      "vida": 56.9131
+    },
+    {
+      "pais": "Bolivia (Plurinational State of)",
+      "cluster": 3,
+      "pib": 27730.5052,
+      "vida": 55.988
+    },
+    {
+      "pais": "Croatia",
+      "cluster": 3,
+      "pib": 27126.5421,
+      "vida": 57.3277
+    },
+    {
+      "pais": "Burundi",
+      "cluster": 0,
+      "pib": 31036.472,
+      "vida": 61.3614
+    },
+    {
+      "pais": "Andorra",
+      "cluster": 2,
+      "pib": 31063.5837,
+      "vida": 57.9565
+    },
+    {
+      "pais": "Nigeria",
+      "cluster": 0,
+      "pib": 30744.745,
+      "vida": 65.7826
+    },
+    {
+      "pais": "Gabon",
+      "cluster": 0,
+      "pib": 31071.6691,
+      "vida": 59.4545
+    },
+    {
+      "pais": "Italy",
+      "cluster": 2,
+      "pib": 31181.7226,
+      "vida": 55.9529
+    },
+    {
+      "pais": "Suriname",
+      "cluster": 2,
+      "pib": 30083.0867,
+      "vida": 56.2314
+    },
+    {
+      "pais": "Lithuania",
+      "cluster": 3,
+      "pib": 28377.6045,
+      "vida": 50.7691
+    },
+    {
+      "pais": "Turkmenistan",
+      "cluster": 3,
+      "pib": 30608.8184,
+      "vida": 47.904
+    },
+    {
+      "pais": "Norway",
+      "cluster": 0,
+      "pib": 28328.0194,
+      "vida": 63.0595
+    },
+    {
+      "pais": "Spain",
+      "cluster": 3,
+      "pib": 28474.1736,
+      "vida": 54.4391
+    },
+    {
+      "pais": "Cuba",
+      "cluster": 1,
+      "pib": 28064.847,
+      "vida": 61.5135
+    },
+    {
+      "pais": "Mauritania",
+      "cluster": 2,
+      "pib": 30170.0159,
+      "vida": 60.1557
+    },
+    {
+      "pais": "Czechia",
+      "cluster": 2,
+      "pib": 31203.9741,
+      "vida": 58.2154
+    },
+    {
+      "pais": "Central African Republic",
+      "cluster": 1,
+      "pib": 32667.4149,
+      "vida": 60.8486
+    },
+    {
+      "pais": "Denmark",
+      "cluster": 0,
+      "pib": 29618.4661,
+      "vida": 61.2834
+    },
+    {
+      "pais": "Niger",
+      "cluster": 1,
+      "pib": 31037.1132,
+      "vida": 59.3682
+    },
+    {
+      "pais": "Barbados",
+      "cluster": 0,
+      "pib": 31909.87,
+      "vida": 62.3055
+    },
+    {
+      "pais": "Bangladesh",
+      "cluster": 2,
+      "pib": 30750.9653,
+      "vida": 57.7095
+    },
+    {
+      "pais": "Curaçao",
+      "cluster": 0,
+      "pib": 30366.0921,
+      "vida": 64.588
+    },
+    {
+      "pais": "Russian Federation",
+      "cluster": 0,
+      "pib": 27783.9283,
+      "vida": 62.094
+    },
+    {
+      "pais": "Venezuela (Bolivarian Republic of)",
+      "cluster": 2,
+      "pib": 30817.1277,
+      "vida": 53.3843
+    },
+    {
+      "pais": "Ireland",
+      "cluster": 0,
+      "pib": 30392.2374,
+      "vida": 64.8038
+    },
+    {
+      "pais": "Congo",
+      "cluster": 0,
+      "pib": 30327.18,
+      "vida": 59.2442
+    },
+    {
+      "pais": "Liechtenstein",
+      "cluster": 2,
+      "pib": 29660.4367,
+      "vida": 56.8655
+    },
+    {
+      "pais": "Thailand",
+      "cluster": 2,
+      "pib": 29970.2515,
+      "vida": 57.926
+    },
+    {
+      "pais": "Bhutan",
+      "cluster": 1,
+      "pib": 31010.5619,
+      "vida": 59.49
+    },
+    {
+      "pais": "Democratic Republic of the Congo",
+      "cluster": 1,
+      "pib": 28846.7293,
+      "vida": 59.8477
+    },
+    {
+      "pais": "Monaco",
+      "cluster": 1,
+      "pib": 30106.1678,
+      "vida": 59.6546
+    },
+    {
+      "pais": "Morocco",
+      "cluster": 0,
+      "pib": 29564.7,
+      "vida": 64.1011
+    },
+    {
+      "pais": "Panama",
+      "cluster": 3,
+      "pib": 27818.6714,
+      "vida": 57.7255
+    },
+    {
+      "pais": "European Union",
+      "cluster": 0,
+      "pib": 29895.2852,
+      "vida": 60.5734
+    },
+    {
+      "pais": "Nauru",
+      "cluster": 1,
+      "pib": 29782.624,
+      "vida": 58.3503
+    },
+    {
+      "pais": "Ukraine",
+      "cluster": 3,
+      "pib": 28759.0589,
+      "vida": 58.4105
+    },
+    {
+      "pais": "Israel",
+      "cluster": 3,
+      "pib": 28023.7703,
+      "vida": 55.0603
+    },
+    {
+      "pais": "Iceland",
+      "cluster": 1,
+      "pib": 30254.3145,
+      "vida": 59.8052
+    },
+    {
+      "pais": "Saint Kitts and Nevis",
+      "cluster": 0,
+      "pib": 29998.7634,
+      "vida": 64.2115
+    },
+    {
+      "pais": "Oman",
+      "cluster": 1,
+      "pib": 29924.0984,
+      "vida": 56.8435
+    },
+    {
+      "pais": "United States of America",
+      "cluster": 0,
+      "pib": 29356.3317,
+      "vida": 61.1118
+    },
+    {
+      "pais": "Cyprus",
+      "cluster": 0,
+      "pib": 30207.4499,
+      "vida": 59.0591
+    },
+    {
+      "pais": "Uruguay",
+      "cluster": 1,
+      "pib": 30270.2967,
+      "vida": 64.0562
+    },
+    {
+      "pais": "Mexico",
+      "cluster": 1,
+      "pib": 29183.3884,
+      "vida": 60.6715
+    },
+    {
+      "pais": "Aruba",
+      "cluster": 0,
+      "pib": 30318.3776,
+      "vida": 61.922
+    },
+    {
+      "pais": "Zimbabwe",
+      "cluster": 3,
+      "pib": 28764.6058,
+      "vida": 56.5929
+    },
+    {
+      "pais": "Estonia",
+      "cluster": 1,
+      "pib": 32179.2001,
+      "vida": 58.1331
+    },
+    {
+      "pais": "Georgia",
+      "cluster": 0,
+      "pib": 29683.6739,
+      "vida": 59.9772
+    },
+    {
+      "pais": "Montenegro",
+      "cluster": 2,
+      "pib": 33004.618,
+      "vida": 55.5811
+    },
+    {
+      "pais": "Indonesia",
+      "cluster": 3,
+      "pib": 29852.1993,
+      "vida": 55.5237
+    },
+    {
+      "pais": "Saint Vincent and the Grenadines",
+      "cluster": 2,
+      "pib": 30582.05,
+      "vida": 59.5769
+    },
+    {
+      "pais": "Guatemala",
+      "cluster": 0,
+      "pib": 29380.4384,
+      "vida": 68.2271
+    },
+    {
+      "pais": "Mongolia",
+      "cluster": 3,
+      "pib": 28170.6121,
+      "vida": 57.1657
+    },
+    {
+      "pais": "Azerbaijan",
+      "cluster": 0,
+      "pib": 30170.5399,
+      "vida": 64.1765
+    },
+    {
+      "pais": "Libya",
+      "cluster": 2,
+      "pib": 31818.243,
+      "vida": 63.7254
+    },
+    {
+      "pais": "Sint Maarten",
+      "cluster": 1,
+      "pib": 29915.8915,
+      "vida": 61.7383
+    },
+    {
+      "pais": "Grenada",
+      "cluster": 3,
+      "pib": 29589.6361,
+      "vida": 55.012
+    },
+    {
+      "pais": "Armenia",
+      "cluster": 0,
+      "pib": 30234.4702,
+      "vida": 61.5105
+    },
+    {
+      "pais": "Tunisia",
+      "cluster": 3,
+      "pib": 27229.4423,
+      "vida": 62.7597
+    },
+    {
+      "pais": "Liberia",
+      "cluster": 3,
+      "pib": 28723.9921,
+      "vida": 56.4188
+    },
+    {
+      "pais": "Honduras",
+      "cluster": 0,
+      "pib": 29641.6164,
+      "vida": 60.9108
+    },
+    {
+      "pais": "Trinidad and Tobago",
+      "cluster": 0,
+      "pib": 27886.3756,
+      "vida": 65.5488
+    },
+    {
+      "pais": "Saudi Arabia",
+      "cluster": 0,
+      "pib": 29986.9635,
+      "vida": 67.9158
+    },
+    {
+      "pais": "Uganda",
+      "cluster": 2,
+      "pib": 31234.1914,
+      "vida": 60.3575
+    },
+    {
+      "pais": "Iran (Islamic Republic of)",
+      "cluster": 0,
+      "pib": 30797.621,
+      "vida": 59.1466
+    },
+    {
+      "pais": "Switzerland",
+      "cluster": 1,
+      "pib": 31986.5723,
+      "vida": 61.4165
+    },
+    {
+      "pais": "Zambia",
+      "cluster": 3,
+      "pib": 28299.1336,
+      "vida": 57.4942
+    },
+    {
+      "pais": "Ethiopia",
+      "cluster": 0,
+      "pib": 29189.2054,
+      "vida": 61.8832
+    },
+    {
+      "pais": "Eswatini",
+      "cluster": 3,
+      "pib": 27976.55,
+      "vida": 59.414
+    },
+    {
+      "pais": "Latvia",
+      "cluster": 2,
+      "pib": 32264.2554,
+      "vida": 63.3735
+    },
+    {
+      "pais": "Jamaica",
+      "cluster": 1,
+      "pib": 30522.9249,
+      "vida": 65.6649
+    },
+    {
+      "pais": "South Sudan",
+      "cluster": 1,
+      "pib": 29100.7231,
+      "vida": 61.5625
+    },
+    {
+      "pais": "United Arab Emirates",
+      "cluster": 3,
+      "pib": 30273.5989,
+      "vida": 51.2232
+    },
+    {
+      "pais": "United Kingdom of Great Britain and Northern Ireland",
+      "cluster": 3,
+      "pib": 26579.9861,
+      "vida": 59.5448
+    },
+    {
+      "pais": "Saint Lucia",
+      "cluster": 0,
+      "pib": 30392.3216,
+      "vida": 71.3512
+    },
+    {
+      "pais": "Guinea",
+      "cluster": 2,
+      "pib": 28979.4725,
+      "vida": 57.4729
+    },
+    {
+      "pais": "Canada",
+      "cluster": 0,
+      "pib": 28833.8646,
+      "vida": 61.8772
+    },
+    {
+      "pais": "Seychelles",
+      "cluster": 2,
+      "pib": 32244.8543,
+      "vida": 60.8009
+    },
+    {
+      "pais": "Uzbekistan",
+      "cluster": 3,
+      "pib": 28760.525,
+      "vida": 58.9191
+    },
+    {
+      "pais": "Samoa",
+      "cluster": 2,
+      "pib": 31328.4818,
+      "vida": 49.324
+    },
+    {
+      "pais": "North Macedonia",
+      "cluster": 3,
+      "pib": 28556.9334,
+      "vida": 46.6406
+    },
+    {
+      "pais": "Kyrgyzstan",
+      "cluster": 3,
+      "pib": 28740.3205,
+      "vida": 55.4343
+    },
+    {
+      "pais": "Mozambique",
+      "cluster": 1,
+      "pib": 30226.187,
+      "vida": 63.0828
+    },
+    {
+      "pais": "Brazil",
+      "cluster": 1,
+      "pib": 28611.2065,
+      "vida": 56.9695
+    },
+    {
+      "pais": "Belize",
+      "cluster": 0,
+      "pib": 29979.407,
+      "vida": 66.8542
+    },
+    {
+      "pais": "Gambia",
+      "cluster": 0,
+      "pib": 29738.0835,
+      "vida": 67.9125
+    },
+    {
+      "pais": "Kenya",
+      "cluster": 0,
+      "pib": 27942.8041,
+      "vida": 65.1046
+    },
+    {
+      "pais": "Lebanon",
+      "cluster": 0,
+      "pib": 30978.8453,
+      "vida": 63.6006
+    },
+    {
+      "pais": "Lao People's Democratic Republic",
+      "cluster": 0,
+      "pib": 29156.8032,
+      "vida": 61.3695
+    },
+    {
+      "pais": "Slovenia",
+      "cluster": 3,
+      "pib": 29407.333,
+      "vida": 55.2808
+    },
+    {
+      "pais": "Antigua and Barbuda",
+      "cluster": 0,
+      "pib": 28798.6037,
+      "vida": 63.3472
+    },
+    {
+      "pais": "Viet Nam",
+      "cluster": 3,
+      "pib": 26830.952,
+      "vida": 63.0951
+    },
+    {
+      "pais": "Dominican Republic",
+      "cluster": 2,
+      "pib": 29551.2375,
+      "vida": 57.9557
+    },
+    {
+      "pais": "Botswana",
+      "cluster": 3,
+      "pib": 28772.5319,
+      "vida": 53.1794
+    },
+    {
+      "pais": "Japan",
+      "cluster": 3,
+      "pib": 27583.8568,
+      "vida": 56.6463
+    },
+    {
+      "pais": "Luxembourg",
+      "cluster": 0,
+      "pib": 31743.9401,
+      "vida": 66.9355
+    },
+    {
+      "pais": "New Zealand",
+      "cluster": 3,
+      "pib": 29269.4151,
+      "vida": 56.88
+    },
+    {
+      "pais": "Bosnia and Herzegovina",
+      "cluster": 0,
+      "pib": 29018.2222,
+      "vida": 64.1198
+    },
+    {
+      "pais": "Haiti",
+      "cluster": 0,
+      "pib": 30122.4523,
+      "vida": 61.528
+    },
+    {
+      "pais": "Poland",
+      "cluster": 3,
+      "pib": 27815.7827,
+      "vida": 56.5749
+    },
+    {
+      "pais": "Republic of Moldova",
+      "cluster": 2,
+      "pib": 30439.8093,
+      "vida": 55.3346
+    },
+    {
+      "pais": "Portugal",
+      "cluster": 3,
+      "pib": 27227.2203,
+      "vida": 54.9765
+    },
+    {
+      "pais": "Australia",
+      "cluster": 0,
+      "pib": 29550.5928,
+      "vida": 60.158
+    },
+    {
+      "pais": "Cameroon",
+      "cluster": 3,
+      "pib": 28689.005,
+      "vida": 58.3446
+    },
+    {
+      "pais": "Papua New Guinea",
+      "cluster": 3,
+      "pib": 25819.9562,
+      "vida": 52.562
+    },
+    {
+      "pais": "Guinea-Bissau",
+      "cluster": 0,
+      "pib": 29878.4507,
+      "vida": 61.6966
+    },
+    {
+      "pais": "Romania",
+      "cluster": 0,
+      "pib": 30151.4851,
+      "vida": 68.6032
+    },
+    {
+      "pais": "Solomon Islands",
+      "cluster": 3,
+      "pib": 28624.2574,
+      "vida": 57.6489
+    },
+    {
+      "pais": "Bulgaria",
+      "cluster": 2,
+      "pib": 32188.2107,
+      "vida": 55.4163
+    },
+    {
+      "pais": "Austria",
+      "cluster": 3,
+      "pib": 28363.8775,
+      "vida": 62.1351
+    },
+    {
+      "pais": "Nepal",
+      "cluster": 2,
+      "pib": 31384.2703,
+      "vida": 60.3054
+    },
+    {
+      "pais": "El Salvador",
+      "cluster": 3,
+      "pib": 29883.6955,
+      "vida": 53.2074
+    },
+    {
+      "pais": "Costa Rica",
+      "cluster": 2,
+      "pib": 31729.2748,
+      "vida": 59.8918
+    },
+    {
+      "pais": "Egypt",
+      "cluster": 0,
+      "pib": 27711.7781,
+      "vida": 62.1255
+    },
+    {
+      "pais": "Kazakhstan",
+      "cluster": 2,
+      "pib": 29209.9999,
+      "vida": 52.5934
+    },
+    {
+      "pais": "Serbia",
+      "cluster": 2,
+      "pib": 30517.3346,
+      "vida": 57.8325
+    },
+    {
+      "pais": "South Africa",
+      "cluster": 0,
+      "pib": 30309.451,
+      "vida": 62.1009
+    },
+    {
+      "pais": "Burkina Faso",
+      "cluster": 3,
+      "pib": 28868.7926,
+      "vida": 54.9649
+    },
+    {
+      "pais": "Bahrain",
+      "cluster": 1,
+      "pib": 32074.0585,
+      "vida": 60.0818
+    },
+    {
+      "pais": "Colombia",
+      "cluster": 0,
+      "pib": 28349.4725,
+      "vida": 62.4652
+    },
+    {
+      "pais": "Hungary",
+      "cluster": 2,
+      "pib": 30434.1544,
+      "vida": 60.38
+    },
+    {
+      "pais": "Pakistan",
+      "cluster": 0,
+      "pib": 29386.0072,
+      "vida": 59.6717
+    },
+    {
+      "pais": "Vanuatu",
+      "cluster": 3,
+      "pib": 28091.7149,
+      "vida": 58.0874
+    },
+    {
+      "pais": "Mauritius",
+      "cluster": 2,
+      "pib": 31016.9779,
+      "vida": 59.8331
+    },
+    {
+      "pais": "Syrian Arab Republic",
+      "cluster": 1,
+      "pib": 30364.3437,
+      "vida": 60.9314
+    },
+    {
+      "pais": "Mali",
+      "cluster": 3,
+      "pib": 29295.1416,
+      "vida": 58.3194
+    },
+    {
+      "pais": "Netherlands",
+      "cluster": 1,
+      "pib": 30163.632,
+      "vida": 59.9243
+    },
+    {
+      "pais": "Democratic People's Republic of Korea",
+      "cluster": 2,
+      "pib": 28291.9541,
+      "vida": 65.0155
+    }
+  ],
+  "tiempos": [
+    {
+      "configuracion": "local[1]",
+      "descripcion": "Ejecución local (1 hilo)",
+      "tiempo_segundos": 3.48,
+      "estado": "OK"
+    },
+    {
+      "configuracion": "local[*]",
+      "descripcion": "Master con todos los núcleos",
+      "tiempo_segundos": 1.471,
+      "estado": "OK"
+    },
+    {
+      "configuracion": "local[4]",
+      "descripcion": "Simulación master + 2 workers",
+      "tiempo_segundos": 1.831,
+      "estado": "OK"
+    }
+  ]
+}
